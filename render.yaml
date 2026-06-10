@@ -12,7 +12,7 @@ services:
       - key: PORT
         value: 10000
       - key: FRONTEND_URL
-        value: https://spectrum-frontend.onrender.com # NOTE: Update with your actual frontend URL after deployment
+        value: https://spectrum-eosin.vercel.app # NOTE: Update with your actual frontend URL after deployment
       - key: MONGO_URI
         sync: false # Set this in the Render dashboard manually
       - key: SESSION_SECRET
