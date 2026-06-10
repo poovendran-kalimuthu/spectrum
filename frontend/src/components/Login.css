@@ -1,0 +1,376 @@
+/* ─── Login / Hero Page ─── */
+
+/* Full viewport wrapper */
+.ln-wrapper {
+  --clr-bg: #05050a;
+  /* very dark background */
+  --clr-text-heading: #ffffff;
+  --clr-text-subtle: #9999b3;
+  --clr-text-muted: #666680;
+
+  min-height: 100dvh;
+  background: var(--clr-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Geometric background SVG */
+.ln-geo-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Navigation ─── */
+.ln-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.ln-nav-left,
+.ln-nav-right {
+  width: 80px;
+}
+
+.ln-hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.ln-hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--clr-text-heading);
+  border-radius: 2px;
+}
+
+.ln-hamburger span:first-child {
+  width: 14px;
+}
+
+.ln-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: -0.03em;
+  color: var(--clr-text-heading);
+}
+
+.ln-logo {
+  width: 30px;
+  height: 30px;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Hero Layout ─── */
+.ln-hero {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem 2.5rem 3rem;
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ─── Left Copy ─── */
+.ln-left {
+  flex: 0 0 auto;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Label */
+.ln-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--clr-text-subtle);
+  margin-bottom: 1.375rem;
+  letter-spacing: 0;
+}
+
+.ln-arrow {
+  font-size: 0.9rem;
+  color: var(--clr-text-heading);
+}
+
+/* Big headline */
+.ln-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 6.5vw, 5.25rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.0;
+  color: var(--clr-text-heading);
+  margin-bottom: 1.625rem;
+}
+
+.ln-headline-line1 {
+  display: block;
+  margin-bottom: 0.12em;
+}
+
+.ln-headline-line2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.18em;
+}
+
+/* Pill/circle word — key reference element */
+.ln-pill-word {
+  display: inline-block;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  padding: 0 0.38em;
+  line-height: 1.15;
+  position: relative;
+}
+
+.ln-headline-word {
+  display: inline-block;
+}
+
+.ln-dot {
+  color: var(--clr-accent);
+  font-size: 1.2em;
+  line-height: 1;
+  display: inline-block;
+  margin-left: 0.05em;
+}
+
+/* Sub copy */
+.ln-sub {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--clr-text-subtle);
+  line-height: 1.7;
+  margin-bottom: 2.25rem;
+  font-weight: 400;
+  max-width: 320px;
+}
+
+/* CTAs */
+.ln-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Black filled pill button — primary */
+.ln-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #05050a;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-height: 48px;
+  letter-spacing: 0;
+}
+
+.ln-btn-primary:hover {
+  background: #e0e0ea;
+  transform: translateY(-1px);
+}
+
+.ln-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.ln-btn-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* Outlined pill button — secondary */
+.ln-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-height: 48px;
+  letter-spacing: 0;
+}
+
+.ln-btn-secondary:hover {
+  background: #ffffff;
+  color: #05050a;
+}
+
+/* Security note */
+.ln-security {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--clr-text-muted);
+}
+
+/* ─── Right Cube Illustration ─── */
+.ln-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 540px;
+  min-height: 420px;
+  position: relative;
+}
+
+.ln-cube-svg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  animation: float 6s ease-in-out infinite;
+  filter: drop-shadow(0 24px 40px rgba(91, 110, 245, 0.15));
+}
+
+/* ─── UI Mockup Illustration ─── */
+.ln-ui-mockup {
+  width: 100%;
+  max-width: 500px;
+  animation: float 6s ease-in-out infinite;
+  filter: drop-shadow(0 20px 30px rgba(91, 110, 245, 0.1));
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 960px) {
+  .ln-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem 2.5rem;
+    gap: 2.5rem;
+  }
+
+  .ln-left {
+    max-width: 100%;
+  }
+
+  .ln-headline {
+    font-size: clamp(2.5rem, 8vw, 3.75rem);
+  }
+
+  .ln-right {
+    width: 100%;
+    max-width: 100%;
+    min-height: 280px;
+    justify-content: center;
+  }
+
+  .ln-cube-svg {
+    max-width: 380px;
+  }
+
+  .ln-ui-mockup {
+    max-width: 440px;
+    margin-top: 1rem;
+  }
+
+  .ln-geo-bg {
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 520px) {
+  .ln-nav {
+    padding: 0 1.25rem;
+  }
+
+  .ln-hero {
+    padding: 1.25rem 1.25rem 2rem;
+  }
+
+  .ln-headline {
+    font-size: clamp(2.25rem, 10vw, 3rem);
+  }
+
+  .ln-headline-line2 {
+    flex-wrap: wrap;
+    gap: 0.12em;
+  }
+
+  .ln-sub {
+    max-width: 100%;
+  }
+
+  .ln-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ln-btn-primary,
+  .ln-btn-secondary {
+    justify-content: center;
+  }
+
+  .ln-cube-svg {
+    max-width: 300px;
+  }
+
+  .ln-ui-mockup {
+    max-width: 100%;
+  }
+}

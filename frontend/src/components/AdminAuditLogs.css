@@ -1,0 +1,470 @@
+/* ── Admin Audit Logs Dashboard Stylesheet ── */
+
+.aal-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: var(--font-body);
+  color: var(--clr-text);
+  animation: fadeIn 0.4s ease both;
+}
+
+/* ── KPI Stats Grid ── */
+.aal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.aal-stat-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.aal-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--clr-accent-2);
+}
+
+.aal-stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--clr-accent);
+}
+
+.aal-stat-card.security-card::after {
+  background: var(--clr-danger);
+}
+.aal-stat-card.system-card::after {
+  background: var(--clr-warning);
+}
+.aal-stat-card.actors-card::after {
+  background: var(--clr-success);
+}
+
+.aal-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--clr-accent-light);
+  color: var(--clr-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+.aal-stat-card.security-card .aal-stat-icon {
+  background: var(--clr-danger-light);
+  color: var(--clr-danger);
+}
+.aal-stat-card.system-card .aal-stat-icon {
+  background: var(--clr-warning-light);
+  color: var(--clr-warning);
+}
+.aal-stat-card.actors-card .aal-stat-icon {
+  background: var(--clr-success-light);
+  color: var(--clr-success);
+}
+
+.aal-stat-content {
+  flex: 1;
+}
+
+.aal-stat-label {
+  font-size: 0.8125rem;
+  color: var(--clr-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.aal-stat-value {
+  font-size: 1.75rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--clr-text-heading);
+  line-height: 1.2;
+  margin: 0.25rem 0;
+}
+
+.aal-stat-sub {
+  font-size: 0.75rem;
+  color: var(--clr-text-subtle);
+}
+
+/* ── Main Dashboard Card ── */
+.aal-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base);
+  margin-bottom: 2rem;
+}
+
+.aal-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--clr-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.aal-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--clr-text-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Search & Filter Controls ── */
+.aal-filter-bar {
+  padding: 1.25rem 1.5rem;
+  background: rgba(244, 244, 249, 0.5);
+  border-bottom: 1px solid var(--clr-border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.aal-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.aal-search-input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--clr-border);
+  outline: none;
+  font-size: 0.875rem;
+  background: var(--clr-surface);
+  color: var(--clr-text-heading);
+  transition: all var(--transition-base);
+}
+
+.aal-search-input:focus {
+  border-color: var(--clr-accent);
+  box-shadow: var(--shadow-focus);
+}
+
+.aal-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-text-muted);
+  pointer-events: none;
+}
+
+.aal-select {
+  padding: 9px 28px 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--clr-border);
+  background: var(--clr-surface);
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--clr-text);
+  min-width: 155px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239999b3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+.aal-select:focus {
+  border-color: var(--clr-accent);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ── Styled Audit Log Table ── */
+.aal-table-wrapper {
+  overflow-x: auto;
+}
+
+.aal-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.aal-table th {
+  padding: 1rem 1.25rem;
+  background: rgba(244, 244, 249, 0.8);
+  border-bottom: 1.5px solid var(--clr-border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--clr-text-muted);
+  white-space: nowrap;
+}
+
+.aal-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--clr-border-subtle);
+  vertical-align: middle;
+  color: var(--clr-text);
+  font-size: 0.85rem;
+  transition: background 0.15s ease;
+}
+
+.aal-table tbody tr {
+  cursor: pointer;
+}
+
+.aal-table tbody tr:hover td {
+  background: rgba(91, 110, 245, 0.02);
+}
+
+.aal-actor-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.aal-actor-name {
+  font-weight: 600;
+  color: var(--clr-text-heading);
+}
+
+.aal-actor-email {
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
+
+.aal-action-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+/* Action Specific Badge Colors */
+.aal-action-badge.create {
+  background: var(--clr-success-light);
+  color: var(--clr-success);
+  border-color: #bbf7d0;
+}
+
+.aal-action-badge.delete {
+  background: var(--clr-danger-light);
+  color: var(--clr-danger);
+  border-color: #fecaca;
+}
+
+.aal-action-badge.update {
+  background: var(--clr-accent-light);
+  color: var(--clr-accent);
+  border-color: #c7ccf9;
+}
+
+.aal-action-badge.auth, .aal-action-badge.login {
+  background: #f0fdfa;
+  color: #0d9488;
+  border-color: #99f6e4;
+}
+
+.aal-action-badge.other {
+  background: var(--clr-surface-2);
+  color: var(--clr-text-subtle);
+  border-color: var(--clr-border);
+}
+
+.aal-details-text {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--clr-text-heading);
+}
+
+.aal-timestamp {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--clr-text-subtle);
+  white-space: nowrap;
+}
+
+.aal-ip-address {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
+
+/* ── Modal Overlay & Detail Layout ── */
+.aal-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 10, 18, 0.45);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.aal-modal {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 680px;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  position: relative;
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.aal-modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--clr-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aal-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--clr-text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.aal-modal-close:hover {
+  background: var(--clr-surface-2);
+  color: var(--clr-text-heading);
+}
+
+.aal-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.aal-detail-section {
+  background: var(--clr-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border-subtle);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.aal-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.5rem;
+}
+
+@media (max-width: 540px) {
+  .aal-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aal-detail-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.aal-field-label {
+  font-size: 0.72rem;
+  color: var(--clr-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  letter-spacing: 0.03em;
+}
+
+.aal-field-value {
+  font-size: 0.875rem;
+  color: var(--clr-text-heading);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.aal-payload-pre {
+  background: #0b0e14;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  font-size: 0.825rem;
+  color: #c9d1d9;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+
+.aal-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--clr-border-subtle);
+  background: rgba(244, 244, 249, 0.4);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Table Action Buttons ── */
+.aal-view-btn {
+  background: transparent;
+  color: var(--clr-text-muted);
+  border: 1px solid transparent;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.aal-view-btn:hover {
+  background: var(--clr-surface-2);
+  color: var(--clr-accent);
+  border-color: var(--clr-border);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}

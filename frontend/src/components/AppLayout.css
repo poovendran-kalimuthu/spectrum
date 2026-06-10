@@ -1,0 +1,50 @@
+/* ════════════════════════════════════════
+   AppLayout — Main shell with sidebar
+   ════════════════════════════════════════ */
+
+.apl-wrapper {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--clr-bg);
+}
+
+/* Main content shifts right by sidebar width */
+.apl-main {
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--sb-width, 260px);
+  transition: margin-left 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5fc;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.05) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* When sidebar is collapsed, less margin */
+.apl-wrapper.sidebar-collapsed .apl-main {
+  margin-left: 64px;
+}
+
+/* Content grows to fill remaining space below TopNav */
+.apl-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tablet: sidebar is always in icon-only mode */
+@media (max-width: 900px) {
+  .apl-main {
+    margin-left: 64px !important;
+  }
+}
+
+/* Mobile: sidebar is a drawer — no margin */
+@media (max-width: 640px) {
+  .apl-main {
+    margin-left: 0 !important;
+    padding-top: 56px;
+  }
+}

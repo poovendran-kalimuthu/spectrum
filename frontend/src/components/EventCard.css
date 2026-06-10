@@ -1,0 +1,449 @@
+/* ──────────────────────────────────────────
+   Shared Event Card — evc-* namespace
+   Used by both EventsList (user) and AdminEvents (admin)
+   ────────────────────────────────────────── */
+
+/* ── Grid ── */
+.evc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  gap: 1.25rem;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 2rem auto;
+  width: 100%;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+/* ── Card shell ── */
+.evc-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.22s cubic-bezier(0.16,1,0.3,1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.evc-card:hover {
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.10);
+}
+
+/* ── Cover photo ── */
+.evc-cover {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--clr-surface-2);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+.evc-cover img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.evc-card:hover .evc-cover img { transform: scale(1.06); }
+
+/* Gradient at bottom of cover so date label reads well */
+.evc-cover-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 40%,
+    rgba(0,0,0,0.38) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Info row (date strip + details) ── */
+.evc-info {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  flex: 1;
+}
+
+/* Left date column */
+.evc-date-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 14px;
+  background: var(--clr-surface);
+  border-right: 1px solid var(--clr-border-subtle);
+  min-width: 58px;
+  flex-shrink: 0;
+}
+.evc-date-mon {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--clr-accent);
+  line-height: 1;
+}
+.evc-date-day {
+  font-family: var(--font-heading);
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--clr-text-heading);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.evc-date-yr {
+  font-size: 0.625rem;
+  color: var(--clr-text-muted);
+  font-weight: 600;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* Right detail column */
+.evc-detail-col {
+  flex: 1;
+  padding: 13px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.evc-category-lbl {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--clr-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.evc-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--clr-text-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.evc-card-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.evc-venue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.795rem;
+  color: var(--clr-text-subtle);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.evc-venue svg {
+  flex-shrink: 0;
+  color: var(--clr-text-muted);
+}
+
+.evc-reg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.evc-reg-pill.open  { color: var(--clr-success); }
+.evc-reg-pill.closed{ color: var(--clr-danger); }
+.evc-reg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.evc-reg-pill.open  .evc-reg-dot { background: var(--clr-success); }
+.evc-reg-pill.closed .evc-reg-dot { background: var(--clr-danger); }
+
+/* ── Admin: Manage button inside card ── */
+.evc-manage-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-top: 1px solid var(--clr-border-subtle);
+  background: var(--clr-surface-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clr-accent);
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+}
+.evc-manage-btn:hover { background: var(--clr-accent-light); }
+.evc-manage-btn svg { transition: transform 0.22s; }
+.evc-manage-btn.open svg { transform: rotate(180deg); }
+
+/* ── Admin: Manage options dropdown (inline in card) ── */
+.evc-actions {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s cubic-bezier(0.16,1,0.3,1);
+  background: var(--clr-surface);
+  border-top: 1px solid var(--clr-border-subtle);
+}
+.evc-actions.expanded { max-height: 260px; }
+
+.evc-action-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 0.845rem;
+  font-weight: 500;
+  color: var(--clr-text-heading);
+  cursor: pointer;
+  transition: background 0.12s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+}
+.evc-action-item:not(:last-child) {
+  border-bottom: 1px solid var(--clr-border-subtle);
+}
+.evc-action-item:hover { background: var(--clr-surface-2); }
+.evc-action-item.danger { color: var(--clr-danger); }
+.evc-action-item.danger:hover { background: var(--clr-danger-light); }
+.evc-action-item svg { flex-shrink: 0; }
+
+/* ── Category type strip (top of card) ── */
+.evc-type-strip {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 3;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .evc-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .evc-cover { height: 170px; }
+}
+
+/* ── Image Overlay Menu (Admin Manage State) ── */
+.evc-image-overlay-menu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.72) 0%, rgba(30, 41, 59, 0.82) 100%);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px;
+  align-content: center;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              backdrop-filter 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              -webkit-backdrop-filter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.evc-image-overlay-menu.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Stagger transition for overlay buttons */
+.evc-image-overlay-menu .evc-overlay-btn {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.28s ease,
+              background 0.18s ease,
+              border-color 0.18s ease,
+              color 0.18s ease;
+}
+
+.evc-image-overlay-menu.active .evc-overlay-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.evc-image-overlay-menu.active .evc-overlay-btn:nth-child(1) { transition-delay: 0.04s; }
+.evc-image-overlay-menu.active .evc-overlay-btn:nth-child(2) { transition-delay: 0.08s; }
+.evc-image-overlay-menu.active .evc-overlay-btn:nth-child(3) { transition-delay: 0.12s; }
+.evc-image-overlay-menu.active .evc-overlay-btn:nth-child(4) { transition-delay: 0.16s; }
+
+.evc-overlay-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 4px;
+  font-family: var(--font-body);
+}
+.evc-overlay-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) !important;
+  color: #fff;
+}
+.evc-overlay-btn:active {
+  transform: translateY(0) !important;
+}
+
+.evc-overlay-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.15s;
+}
+.evc-overlay-btn:hover .evc-overlay-btn-icon {
+  color: #fff;
+}
+
+/* Delete Button - Monochrome Accent */
+.evc-overlay-btn.danger {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+.evc-overlay-btn.danger .evc-overlay-btn-icon {
+  color: #fca5a5;
+}
+.evc-overlay-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+/* View Details Button - Monochrome Accent */
+.evc-overlay-btn.primary {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.evc-overlay-btn.primary .evc-overlay-btn-icon {
+  color: #fff;
+}
+.evc-overlay-btn.primary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Confirmation panel animation */
+.evc-confirm-panel {
+  animation: evcConfirmReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes evcConfirmReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Labels Row above title */
+.evc-labels-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* Event Type Label inside card body */
+.evc-type-lbl {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.evc-type-lbl.macro {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.evc-type-lbl.internal {
+  background: rgba(245, 158, 11, 0.08);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.evc-type-lbl.general, .evc-type-lbl.micro {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+/* Timing and Sub-events rows inside detail column */
+.evc-timing, .evc-subs-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--clr-text-subtle);
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+
