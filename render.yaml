@@ -1,0 +1,44 @@
+services:
+  # Backend Node.js Service
+  - type: web
+    name: spectrum-backend
+    env: node
+    region: ohio # Adjust if needed
+    buildCommand: "cd backend && npm install"
+    startCommand: "cd backend && npm start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        value: https://spectrum-frontend.onrender.com # NOTE: Update with your actual frontend URL after deployment
+      - key: MONGO_URI
+        sync: false # Set this in the Render dashboard manually
+      - key: SESSION_SECRET
+        sync: false # Set this in the Render dashboard manually
+      - key: GOOGLE_CLIENT_ID
+        sync: false # Set this in the Render dashboard manually
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false # Set this in the Render dashboard manually
+      - key: MICROSOFT_CLIENT_ID
+        sync: false # Set this in the Render dashboard manually
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false # Set this in the Render dashboard manually
+      - key: MICROSOFT_TENANT_ID
+        sync: false # Set this in the Render dashboard manually
+
+  # Frontend React (Vite) Static Site
+  - type: web
+    name: spectrum-frontend
+    env: static
+    region: ohio # Adjust if needed
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://spectrum-backend.onrender.com # NOTE: Update with your actual backend URL after deployment
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
