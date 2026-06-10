@@ -32,7 +32,6 @@ services:
   - type: web
     name: spectrum-frontend
     env: static
-    region: ohio # Adjust if needed
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: ./frontend/dist
     envVars:
