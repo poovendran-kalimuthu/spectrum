@@ -11,21 +11,31 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // @desc    Google auth callback
 // @route   GET /api/auth/google/callback
-router.get('/google/callback', 
-  passport.authenticate('google', {
-    failureRedirect: '/api/auth/login/failed',
-  }),
-  (req, res) => {
-    // Explicitly save session before redirecting to prevent race conditions on strict browsers (Safari/iPhone)
-    req.session.save((err) => {
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', (err, user, info) => {
+    if (err) {
+      console.error('Google Auth Error:', err);
+      return res.redirect('/api/auth/login/failed');
+    }
+    if (!user) {
+      console.error('Google Auth Failed (no user):', info);
+      return res.redirect('/api/auth/login/failed');
+    }
+    req.logIn(user, (err) => {
       if (err) {
-        console.error('Session save error:', err);
-        return res.redirect(`${process.env.FRONTEND_URL}/login?error=session_loss`);
+        console.error('Google logIn Error:', err);
+        return res.redirect('/api/auth/login/failed');
       }
-      res.redirect(`${process.env.FRONTEND_URL}/dashboard?sid=${req.sessionID}`);
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.redirect(`${process.env.FRONTEND_URL}/login?error=session_loss`);
+        }
+        res.redirect(`${process.env.FRONTEND_URL}/dashboard?sid=${req.sessionID}`);
+      });
     });
-  }
-);
+  })(req, res, next);
+});
 
 // @desc    Auth with Microsoft (Initiates the OAuth flow)
 // @route   GET /api/auth/microsoft
@@ -33,20 +43,31 @@ router.get('/microsoft', passport.authenticate('microsoft', { prompt: 'select_ac
 
 // @desc    Microsoft auth callback
 // @route   GET /api/auth/microsoft/callback
-router.get('/microsoft/callback', 
-  passport.authenticate('microsoft', {
-    failureRedirect: '/api/auth/login/failed',
-  }),
-  (req, res) => {
-    req.session.save((err) => {
+router.get('/microsoft/callback', (req, res, next) => {
+  passport.authenticate('microsoft', (err, user, info) => {
+    if (err) {
+      console.error('Microsoft Auth Error:', err);
+      return res.redirect('/api/auth/login/failed');
+    }
+    if (!user) {
+      console.error('Microsoft Auth Failed (no user):', info);
+      return res.redirect('/api/auth/login/failed');
+    }
+    req.logIn(user, (err) => {
       if (err) {
-        console.error('Session save error:', err);
-        return res.redirect(`${process.env.FRONTEND_URL}/login?error=session_loss`);
+        console.error('Microsoft logIn Error:', err);
+        return res.redirect('/api/auth/login/failed');
       }
-      res.redirect(`${process.env.FRONTEND_URL}/dashboard?sid=${req.sessionID}`);
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.redirect(`${process.env.FRONTEND_URL}/login?error=session_loss`);
+        }
+        res.redirect(`${process.env.FRONTEND_URL}/dashboard?sid=${req.sessionID}`);
+      });
     });
-  }
-);
+  })(req, res, next);
+});
 
 // @desc    Check successful login and return user details
 // @route   GET /api/auth/login/success
