@@ -36,7 +36,7 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://spectrum-backend.onrender.com # NOTE: Update with your actual backend URL after deployment
+        value: https://spectrum-vjzd.onrender.com # NOTE: Update with your actual backend URL after deployment
     routes:
       - type: rewrite
         source: /*
