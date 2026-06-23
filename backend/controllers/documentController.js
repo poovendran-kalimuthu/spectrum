@@ -206,13 +206,13 @@ export const deleteDocument = async (req, res) => {
   }
 };
 
-// New: public/approved documents for the "All Documents" section
+// All Documents: Approved docs + docs uploaded without approvers (auto-approved)
 export const getPublicDocuments = async (req, res) => {
   try {
     const docs = await Document.find({
       $or: [
         { status: 'Approved' },
-        { isPublic: true, status: 'Approved' }
+        { approvers: { $size: 0 } }
       ]
     }).populate('sender', 'name email profilePicture role')
       .populate('approvers', 'name email role')
