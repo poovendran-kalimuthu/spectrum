@@ -17,6 +17,9 @@ export const uploadDocument = async (req, res) => {
       approvers = [];
     }
 
+    // If no approvers selected, auto-approve immediately
+    const autoApprove = approvers.length === 0;
+
     const newDoc = new Document({
       title: req.body.title,
       documentType: req.body.documentType,
@@ -24,13 +27,13 @@ export const uploadDocument = async (req, res) => {
       sender: req.user._id,
       approvers: approvers,
       approvalsReceived: [],
-      status: 'Pending',
+      status: autoApprove ? 'Approved' : 'Pending',
       dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
       isPublic: req.body.isPublic === 'true' || req.body.isPublic === true
     });
 
     await newDoc.save();
-    console.log('Document uploaded:', newDoc._id, 'by:', req.user._id, 'approvers:', approvers);
+    console.log('Document uploaded:', newDoc._id, 'by:', req.user._id, 'approvers:', approvers, 'autoApproved:', autoApprove);
     res.status(201).json({ success: true, document: newDoc });
   } catch (err) {
     console.error('Upload Error:', err);
@@ -174,12 +177,15 @@ export const deleteDocument = async (req, res) => {
     const doc = await Document.findById(id);
     if (!doc) return res.status(404).json({ success: false, message: 'Document not found' });
 
-    // Authorization: User is the sender OR has an admin role
+    // Only the original sender can delete
     const isSender = doc.sender.toString() === userId.toString();
-    const isAdmin = ['superadmin', 'admin_t1', 'admin_t2'].includes(req.user.role);
+    if (!isSender) {
+      return res.status(403).json({ success: false, message: 'Only the sender can delete this document' });
+    }
 
-    if (!isSender && !isAdmin) {
-      return res.status(403).json({ success: false, message: 'Not authorized to delete this document' });
+    // Cannot delete after it has been fully approved
+    if (doc.status === 'Approved') {
+      return res.status(403).json({ success: false, message: 'Approved documents cannot be deleted' });
     }
 
     // Delete the file from the filesystem if it exists
@@ -196,6 +202,26 @@ export const deleteDocument = async (req, res) => {
     res.json({ success: true, message: 'Document deleted successfully' });
   } catch (err) {
     console.error('Delete Document Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// New: public/approved documents for the "All Documents" section
+export const getPublicDocuments = async (req, res) => {
+  try {
+    const docs = await Document.find({
+      $or: [
+        { status: 'Approved' },
+        { isPublic: true, status: 'Approved' }
+      ]
+    }).populate('sender', 'name email profilePicture role')
+      .populate('approvers', 'name email role')
+      .populate('approvalsReceived', 'name email role')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, documents: docs });
+  } catch (err) {
+    console.error('Get Public Docs Error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

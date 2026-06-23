@@ -3,7 +3,7 @@ import { protect } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { uploadDocument, getDocuments, approveDocument, rejectDocument, addComment, deleteDocument } from '../controllers/documentController.js';
+import { uploadDocument, getDocuments, approveDocument, rejectDocument, addComment, deleteDocument, getPublicDocuments } from '../controllers/documentController.js';
 
 // Ensure uploads directory exists
 const uploadDir = 'uploads';
@@ -26,6 +26,7 @@ const router = express.Router();
 
 router.post('/upload', protect, upload.single('pdf'), uploadDocument);
 router.get('/', protect, getDocuments);
+router.get('/public', protect, getPublicDocuments);
 router.patch('/:id/approve', protect, approveDocument);
 router.patch('/:id/reject', protect, rejectDocument);
 router.post('/:id/comments', protect, addComment);

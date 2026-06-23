@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 import './Sidebar.css';
 
-const NAV_STRUCTURE = (role) => {
+const NAV_STRUCTURE = (role, pendingApprovalsCount = 0) => {
   const isAdmin = ['superadmin', 'admin_t1', 'admin_t2'].includes(role);
   const isSuperAdmin = role === 'superadmin';
 
@@ -127,7 +127,8 @@ const NAV_STRUCTURE = (role) => {
           sub: [
             { key: '/admin/documents', label: 'All Documents' },
             { key: '/admin/documents?action=new', label: 'New Document', icon: FilePlus },
-            { key: '/admin/documents?tab=approvals', label: 'Approvals', icon: TicketCheck },
+            { key: '/admin/documents?tab=submissions', label: 'My Submissions', icon: FileSearch },
+            { key: '/admin/documents?tab=approvals', label: 'Approvals', icon: TicketCheck, badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : null },
           ],
         },
       ],
@@ -145,7 +146,7 @@ const NAV_STRUCTURE = (role) => {
 };
 
 
-const Sidebar = ({ user, onCollapse }) => {
+const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -209,7 +210,7 @@ const Sidebar = ({ user, onCollapse }) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const navStructure = NAV_STRUCTURE(user?.role);
+  const navStructure = NAV_STRUCTURE(user?.role, pendingApprovalsCount);
 
   const effectivelyCollapsed = collapsed && !isHovered;
 
