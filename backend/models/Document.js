@@ -19,6 +19,10 @@ const documentSchema = new mongoose.Schema({
     enum: ['Pending', 'Approved', 'Rejected'],
     default: 'Pending'
   },
+  isPublic: {
+    type: Boolean,
+    default: false
+  },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -33,6 +37,10 @@ const documentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  dueDate: {
+    type: Date,
+    default: null
+  },
   comments: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: { type: String },

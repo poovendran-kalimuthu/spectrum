@@ -370,8 +370,10 @@ const Sidebar = ({ user, onCollapse }) => {
         {/* ── Footer ── */}
         <div className="sb-footer">
           {user && (
-            <button
+            <div
               className="sb-user-card"
+              role="button"
+              tabIndex={0}
               onClick={() => navigate('/edit-profile')}
               title={collapsed ? `${user.name || user.email} · ${formatRole(user.role)}` : undefined}
             >
@@ -398,7 +400,7 @@ const Sidebar = ({ user, onCollapse }) => {
                 </button>
               )}
               {collapsed && <span className="sb-tooltip">{user.name || user.email}</span>}
-            </button>
+            </div>
           )}
 
           <div className={`sb-status ${showLabels ? '' : 'icon-only'}`} title={collapsed ? 'System Online' : undefined}>

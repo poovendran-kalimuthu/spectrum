@@ -62,6 +62,15 @@ const userSchema = new mongoose.Schema({
   adminPosition: {
     type: String,
     default: 'Member'
+  },
+  settings: {
+    language: { type: String, default: 'English (US)' },
+    timezone: { type: String, default: 'IST (Indian Standard Time)' },
+    emailNotifications: { type: Boolean, default: true },
+    pushNotifications: { type: Boolean, default: false },
+    eventUpdates: { type: Boolean, default: true },
+    theme: { type: String, default: 'System' },
+    compactMode: { type: Boolean, default: false }
   }
 }, { timestamps: true });
 

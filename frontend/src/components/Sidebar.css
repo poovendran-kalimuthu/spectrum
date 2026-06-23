@@ -12,7 +12,7 @@
   --sb-text-active: #ffffff;
   --sb-item-hover: rgba(255, 255, 255, 0.05);
   --sb-item-active: rgba(255, 255, 255, 0.1);
-  --sb-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --sb-transition: var(--transition-slow);
 }
 
 /* ══ Sidebar Shell ══ */
@@ -78,7 +78,7 @@
   justify-content: center;
   color: #09090b;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-base);
 }
 
 .sb-logo:hover .sb-logo-icon {
@@ -128,7 +128,7 @@
   cursor: pointer;
   border-radius: 6px;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: all var(--transition-fast);
 }
 
 .sb-collapse-btn:hover {
@@ -197,7 +197,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   text-align: left;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
   overflow: hidden;
   position: relative;
@@ -227,7 +227,7 @@
   flex-shrink: 0;
   stroke-width: 1.75;
   color: #52525b;
-  transition: color 0.14s ease;
+  transition: color var(--transition-fast);
 }
 
 .sb-item:hover .sb-icon { color: #a1a1aa; }
@@ -248,7 +248,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  transition: transform 0.18s ease;
+  transition: transform var(--transition-base);
 }
 
 .sb-badge {
@@ -306,6 +306,10 @@
 }
 
 /* ══ Sub items (expanded) ══ */
+.sp-collapsed .sb-sub-list {
+  display: none !important;
+}
+
 .sb-sub-list {
   display: flex;
   flex-direction: column;

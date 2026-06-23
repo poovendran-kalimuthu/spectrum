@@ -37,7 +37,7 @@
 
 .custom-select-icon {
   color: var(--clr-text-muted);
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-base);
 }
 
 .custom-select-trigger.open .custom-select-icon {
@@ -76,7 +76,7 @@
   color: var(--clr-text);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-fast);
 }
 
 .custom-select-item:hover:not(.disabled) {

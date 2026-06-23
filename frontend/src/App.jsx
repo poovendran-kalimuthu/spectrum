@@ -27,7 +27,7 @@ import AdminTeam from './components/AdminTeam';
 import ProtectedRoute from './components/ProtectedRoute';
 import WinnersBoard from './components/WinnersBoard';
 import AppLayout from './components/AppLayout';
-
+import Settings from './components/Settings';
 // Global OAuth persistence
 axios.defaults.withCredentials = true;
 
@@ -87,12 +87,14 @@ function App() {
         <Route path="/events/:id/project-submission" element={<Protected><ProjectSubmission /></Protected>} />
         <Route path="/events/:id/winners"     element={<Protected><WinnersBoard /></Protected>} />
         <Route path="/feedback"               element={<Protected><Feedback /></Protected>} />
+        <Route path="/settings"               element={<Protected><Settings /></Protected>} />
 
         {/* Admin Routes */}
         <Route path="/admin"                           element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/dashboard"                 element={<Protected><AdminOverview /></Protected>} />
         <Route path="/admin/team"                      element={<Protected><AdminTeam /></Protected>} />
         <Route path="/admin/events"                    element={<Protected><AdminEvents /></Protected>} />
+        <Route path="/admin/events/create"             element={<Protected><AdminEvents /></Protected>} />
         <Route path="/admin/events/:id"                element={<Protected><AdminEventDetail /></Protected>} />
         <Route path="/admin/events/:id/participants"   element={<Protected><AdminParticipantManagement /></Protected>} />
         <Route path="/admin/events/:id/evaluators"     element={<Protected><AdminEvaluators /></Protected>} />

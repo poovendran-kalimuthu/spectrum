@@ -29,13 +29,15 @@ const Select = ({ value, onChange, name, children, className, style, disabled, .
 
   const handleSelect = (option) => {
     if (disabled || option.disabled) return;
-    setIsOpen(false);
     if (onChange) {
       // Simulate event object
       onChange({
         target: { name, value: option.value }
       });
     }
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
   };
 
   const cleanClassName = (className || '')

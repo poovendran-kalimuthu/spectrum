@@ -30,7 +30,7 @@ export const getAdminAnalytics = async (req, res) => {
 // @desc    Create a new event
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, contactDetails, slug, noOfDays, dates } = req.body;
+    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, designation, resourcePersonImage, slug, noOfDays, dates } = req.body;
     
     const event = await Event.create({
       title,
@@ -50,7 +50,8 @@ export const createEvent = async (req, res) => {
       category: category || 'None',
       macroCountLimit: macroCountLimit || 0,
       resourcePerson: eventType === 'macro' ? '' : (resourcePerson || ''),
-      contactDetails: eventType === 'macro' ? '' : (contactDetails || ''),
+      designation: eventType === 'macro' ? '' : (designation || ''),
+      resourcePersonImage: eventType === 'macro' ? '' : (resourcePersonImage || ''),
       slug,
       noOfDays: eventType === 'macro' ? (noOfDays || 1) : 1,
       dates: eventType === 'macro' ? (dates || []) : [],
@@ -80,7 +81,8 @@ export const updateEvent = async (req, res) => {
     if (event.eventType === 'macro') {
       event.location = '';
       event.resourcePerson = '';
-      event.contactDetails = '';
+      event.designation = '';
+      event.resourcePersonImage = '';
     } else {
       event.noOfDays = 1;
       event.dates = [];
@@ -681,7 +683,7 @@ export const generateMeetLink = async (req, res) => {
     
     // Check if Credentials exist
     if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
-      // Simulate meet link if credentials are not present (so the frontend works for now)
+      // Simulate meet link if credentials are not present
       const mockMeetCode = Math.random().toString(36).substring(2, 5) + '-' + Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 5);
       
       return res.status(200).json({ 
@@ -694,22 +696,22 @@ export const generateMeetLink = async (req, res) => {
 
     const { google } = await import('googleapis');
     
-    // Format private key (replace literal \n with actual newlines)
     const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
 
-    const auth = new google.auth.JWT(
-      process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      null,
-      privateKey,
-      ['https://www.googleapis.com/auth/calendar']
-    );
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: privateKey,
+      },
+      scopes: ['https://www.googleapis.com/auth/calendar']
+    });
 
     const calendar = google.calendar({ version: 'v3', auth });
 
     const event = {
       summary: title,
       start: {
-        dateTime: startDateTime, // e.g., '2026-06-10T09:00:00-07:00'
+        dateTime: startDateTime, 
         timeZone: 'Asia/Kolkata',
       },
       end: {
@@ -726,8 +728,10 @@ export const generateMeetLink = async (req, res) => {
       }
     };
 
+    const targetCalendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
+
     const response = await calendar.events.insert({
-      calendarId: 'primary',
+      calendarId: targetCalendarId,
       resource: event,
       conferenceDataVersion: 1
     });
@@ -740,6 +744,6 @@ export const generateMeetLink = async (req, res) => {
 
   } catch (error) {
     console.error('Google Meet API Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to generate Meet link via API', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to generate Meet link via API. Check Calendar sharing settings.', error: error.message });
   }
 };

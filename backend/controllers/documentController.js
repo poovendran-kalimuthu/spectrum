@@ -1,5 +1,7 @@
 import Document from '../models/Document.js';
 import User from '../models/User.js';
+import fs from 'fs';
+import path from 'path';
 
 export const uploadDocument = async (req, res) => {
   try {
@@ -22,7 +24,9 @@ export const uploadDocument = async (req, res) => {
       sender: req.user._id,
       approvers: approvers,
       approvalsReceived: [],
-      status: 'Pending'
+      status: 'Pending',
+      dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+      isPublic: req.body.isPublic === 'true' || req.body.isPublic === true
     });
 
     await newDoc.save();
@@ -161,3 +165,38 @@ export const addComment = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+export const deleteDocument = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const doc = await Document.findById(id);
+    if (!doc) return res.status(404).json({ success: false, message: 'Document not found' });
+
+    // Authorization: User is the sender OR has an admin role
+    const isSender = doc.sender.toString() === userId.toString();
+    const isAdmin = ['superadmin', 'admin_t1', 'admin_t2'].includes(req.user.role);
+
+    if (!isSender && !isAdmin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this document' });
+    }
+
+    // Delete the file from the filesystem if it exists
+    if (doc.fileUrl) {
+      const filename = doc.fileUrl.replace('/uploads/', '');
+      const filepath = path.join('uploads', filename);
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+    }
+
+    await Document.findByIdAndDelete(id);
+    console.log('Document deleted:', id, 'by:', userId);
+    res.json({ success: true, message: 'Document deleted successfully' });
+  } catch (err) {
+    console.error('Delete Document Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+

@@ -15,6 +15,7 @@ import {
   XCircle, 
   ArrowLeft, 
   Plus, 
+  Minus,
   X, 
   FileText, 
   MessageSquare, 
@@ -38,7 +39,8 @@ import {
   Award,
   Key,
   Send,
-  SpellCheck
+  SpellCheck,
+  Clock
 } from 'lucide-react';
 
 const WIZARD_STEPS = [
@@ -76,7 +78,8 @@ const SUB_EVENT_EMPTY_FORM = {
   parentEvent: '',
   category: 'None',
   resourcePerson: '',
-  contactDetails: ''
+  designation: '',
+  resourcePersonImage: ''
 };
 
 // --- Safe Date Utilities ---
@@ -303,7 +306,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     const dayStr = String(day).padStart(2, '0');
     const formatted = `${year}-${month}-${dayStr}`;
     onChange({ target: { name: 'date', value: formatted } });
-    setIsOpen(false);
+    setTimeout(() => setIsOpen(false), 150);
   };
 
   const year = currentMonth.getFullYear();
@@ -337,12 +340,26 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
           required
           placeholder={placeholder}
           value={formatDateDisplay(value)} 
-          className="form-input datepicker-display-input"
-          style={{ width: '100%', cursor: 'pointer', paddingRight: '40px' }}
+          className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
+          style={{ 
+            width: '100%', 
+            cursor: 'pointer', 
+            paddingRight: '40px',
+            borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
+            boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
+            transition: 'all var(--transition-base)'
+          }}
         />
         <CalendarIcon 
           size={16} 
-          style={{ position: 'absolute', right: '14px', color: 'var(--clr-text-muted)', pointerEvents: 'none' }} 
+          style={{ 
+            position: 'absolute', 
+            right: '14px', 
+            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
+            transform: isOpen ? 'scale(1.15) translateY(-1px)' : 'scale(1) translateY(0)',
+            transition: 'all var(--transition-base)',
+            pointerEvents: 'none' 
+          }} 
         />
       </div>
 
@@ -396,6 +413,208 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
   );
 };
 
+// --- Custom Clock TimePicker ---
+const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  let initHour = 9;
+  let initMin = 0;
+  let initAmPm = 'AM';
+  
+  if (value) {
+    const [h, m] = value.split(':');
+    let hr = parseInt(h);
+    initMin = parseInt(m);
+    if (hr >= 12) {
+      initAmPm = 'PM';
+      if (hr > 12) hr -= 12;
+    } else if (hr === 0) {
+      hr = 12;
+    }
+    initHour = hr;
+  }
+
+  const [hour, setHour] = useState(initHour);
+  const [minute, setMinute] = useState(initMin);
+  const [ampm, setAmPm] = useState(initAmPm);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleTimeChange = (h, m, ap) => {
+    let hr24 = h;
+    if (ap === 'PM' && h !== 12) hr24 += 12;
+    if (ap === 'AM' && h === 12) hr24 = 0;
+    
+    const hrStr = String(hr24).padStart(2, '0');
+    const minStr = String(m).padStart(2, '0');
+    
+    onChange({ target: { name, value: `${hrStr}:${minStr}` } });
+  };
+
+  const handleHourSelect = (h) => {
+    setHour(h);
+    handleTimeChange(h, minute, ampm);
+  };
+
+  const handleMinuteSelect = (m) => {
+    setMinute(m);
+    handleTimeChange(hour, m, ampm);
+  };
+
+  const handleAmPmSelect = (ap) => {
+    setAmPm(ap);
+    handleTimeChange(hour, minute, ap);
+  };
+
+  const formatDisplay = () => {
+    if (!value) return '';
+    return `${hour}:${String(minute).padStart(2, '0')} ${ampm}`;
+  };
+
+  return (
+    <div className="custom-datepicker" ref={containerRef}>
+      <div
+        className="datepicker-input-wrapper"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
+      >
+        <input
+          type="text"
+          readOnly
+          placeholder={placeholder}
+          value={formatDisplay()}
+          className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
+          style={{ 
+            width: '100%', 
+            cursor: 'pointer', 
+            paddingRight: '40px',
+            borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
+            boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
+            transition: 'all var(--transition-base)'
+          }}
+        />
+        <Clock
+          size={16}
+          style={{ 
+            position: 'absolute', 
+            right: '14px', 
+            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
+            transform: isOpen ? 'scale(1.15) rotate(15deg)' : 'scale(1) rotate(0deg)',
+            transition: 'all var(--transition-base)',
+            pointerEvents: 'none' 
+          }}
+        />
+      </div>
+
+      {isOpen && (
+        <div className="datepicker-popover animate-scale-in glass-strong" style={{ width: '280px', padding: '1rem', zIndex: 1000 }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <button 
+              type="button" 
+              onClick={() => handleAmPmSelect('AM')}
+              style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'AM' ? '#0f172a' : '#f8fafc', color: ampm === 'AM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
+            >
+              AM
+            </button>
+            <button 
+              type="button" 
+              onClick={() => handleAmPmSelect('PM')}
+              style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'PM' ? '#0f172a' : '#f8fafc', color: ampm === 'PM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
+            >
+              PM
+            </button>
+          </div>
+
+          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hour</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px', marginBottom: '1.25rem' }}>
+            {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
+              <button
+                key={h}
+                type="button"
+                onClick={() => handleHourSelect(h)}
+                style={{ 
+                  padding: '6px 0', 
+                  borderRadius: '4px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  background: hour === h ? '#0f172a' : 'transparent',
+                  color: hour === h ? '#fff' : '#0f172a',
+                  border: hour === h ? '1px solid #0f172a' : '1px solid #e2e8f0',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                {h}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Minute</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '1.25rem' }}>
+            {[0, 15, 30, 45].map(m => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => handleMinuteSelect(m)}
+                style={{ 
+                  padding: '6px 0', 
+                  borderRadius: '4px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  background: minute === m ? '#0f172a' : 'transparent',
+                  color: minute === m ? '#fff' : '#0f172a',
+                  border: minute === m ? '1px solid #0f172a' : '1px solid #e2e8f0',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                {String(m).padStart(2, '0')}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setTimeout(() => setIsOpen(false), 150);
+            }}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              background: '#0f172a',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all var(--transition-base)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#000000'}
+            onMouseOut={(e) => e.currentTarget.style.background = '#0f172a'}
+          >
+            Confirm Time
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // --- Premium Toast Notification Component ---
 const PremiumToast = ({ toast, onClose }) => {
   if (!toast || !toast.text) return null;
@@ -420,6 +639,54 @@ const PremiumToast = ({ toast, onClose }) => {
   );
 };
 
+// --- Premium Number Stepper Component ---
+const StepperInput = ({ value, onChange, name, min = 0, max = Infinity, placeholder = "" }) => {
+  const handleDecrement = () => {
+    const val = Math.max(min, (parseInt(value) || 0) - 1);
+    onChange({ target: { name, value: val, type: 'number' } });
+  };
+  const handleIncrement = () => {
+    const val = Math.min(max, (parseInt(value) || 0) + 1);
+    onChange({ target: { name, value: val, type: 'number' } });
+  };
+  const handleChange = (e) => {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = '';
+    onChange({ target: { name, value: val, type: 'number' } });
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', background: 'var(--clr-surface)', border: '1.5px solid var(--clr-border)', borderRadius: '10px', overflow: 'hidden', height: '42px', transition: 'all var(--transition-base)' }}>
+      <button 
+        type="button" 
+        onClick={handleDecrement}
+        style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderRight: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
+        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
+        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--clr-text-muted)'; }}
+      >
+        <Minus size={16} />
+      </button>
+      <input 
+        type="text" 
+        name={name}
+        value={value} 
+        onChange={handleChange}
+        placeholder={placeholder}
+        style={{ flex: 1, height: '100%', border: 'none', textAlign: 'center', background: 'transparent', fontWeight: 600, color: 'var(--clr-text-heading)', fontSize: '0.9rem', outline: 'none' }}
+      />
+      <button 
+        type="button" 
+        onClick={handleIncrement}
+        style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderLeft: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
+        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
+        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--clr-text-muted)'; }}
+      >
+        <Plus size={16} />
+      </button>
+    </div>
+  );
+};
+
 const AdminEventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -431,6 +698,7 @@ const AdminEventDetail = () => {
   const [toast, setToast] = useState({ text: '', type: '' });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [allEvents, setAllEvents] = useState([]);
+  const [venues, setVenues] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [showAddCoordinatorModal, setShowAddCoordinatorModal] = useState(false);
   const [newCoordinator, setNewCoordinator] = useState({ name: '', email: '', role: 'Lead Coordinator' });
@@ -527,7 +795,15 @@ const AdminEventDetail = () => {
   useEffect(() => {
     fetchUser();
     fetchEvent();
+    fetchVenues();
   }, [id]);
+
+  const fetchVenues = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/venues`, { withCredentials: true });
+      if (res.data.success) setVenues(res.data.venues);
+    } catch (err) { console.error("Error fetching venues:", err); }
+  };
 
   const fetchUser = async () => {
     try {
@@ -592,7 +868,8 @@ const AdminEventDetail = () => {
             category: ev.category || 'None',
             macroCountLimit: ev.macroCountLimit || 5,
             resourcePerson: ev.resourcePerson || '',
-            contactDetails: ev.contactDetails || '',
+            designation: ev.designation || '',
+            resourcePersonImage: ev.resourcePersonImage || '',
             noOfDays: ev.noOfDays || 1,
             dates: ev.dates && ev.dates.length > 0 ? ev.dates.map(d => getLocalDateString(d)) : [],
             endDate: ev.dates && ev.dates.length > 0 ? getLocalDateString(ev.dates[ev.dates.length - 1]) : (ev.date ? getLocalDateString(ev.date) : ''),
@@ -743,6 +1020,36 @@ const AdminEventDetail = () => {
       msg.reacted = true;
     }
     setChatMessages(updated);
+  };
+  const handleResourceImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = 400; // Profile pic size
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = height * (MAX_WIDTH / width);
+          width = MAX_WIDTH;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const base64Str = canvas.toDataURL('image/jpeg', 0.8);
+        setFormData(f => ({ ...f, resourcePersonImage: base64Str }));
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleInputChange = e => {
@@ -1598,22 +1905,49 @@ const AdminEventDetail = () => {
                       <div className="ae-form-row">
                         <div className="form-group">
                           <label className="form-label">Event Date</label>
-                          <input type="date" name="date" className="form-input" value={formData.date} onChange={handleInputChange} />
+                          <DatePicker value={formData.date} onChange={handleInputChange} />
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Event Slot/Session</label>
-                          <Select name="session" className="form-select" value={formData.session} onChange={handleInputChange}>
-                            <option value="none">General / No Specific Session</option>
-                            <option value="day1_morning">Day 1 - Morning (9:00 AM - 12:30 PM)</option>
-                            <option value="day1_afternoon">Day 1 - Afternoon (1:30 PM - 5:00 PM)</option>
-                            <option value="day2_morning">Day 2 - Morning (9:00 AM - 1:00 PM)</option>
-                          </Select>
+                          <label className="form-label">Event Session Window</label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ flex: 1 }}>
+                              <TimePicker 
+                                name="session-start"
+                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00'} 
+                                onChange={(e) => {
+                                  const end = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00';
+                                  handleInputChange({ target: { name: 'session', value: `${e.target.value || '09:00'} - ${end}` } });
+                                }}
+                              />
+                            </div>
+                            <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>TO</span>
+                            <div style={{ flex: 1 }}>
+                              <TimePicker 
+                                name="session-end"
+                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00'} 
+                                onChange={(e) => {
+                                  const start = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00';
+                                  handleInputChange({ target: { name: 'session', value: `${start} - ${e.target.value || '13:00'}` } });
+                                }}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       <div className="form-group">
                         <label className="form-label">Location / Hall Venue</label>
-                        <input type="text" name="location" className="form-input" placeholder="e.g. Lab 4, Seminar Hall II" value={formData.location} onChange={handleInputChange} />
+                        <Select 
+                          name="location" 
+                          className="form-select" 
+                          value={formData.location} 
+                          onChange={handleInputChange}
+                        >
+                          <option value="" disabled>Select a Venue...</option>
+                          {venues.map(v => (
+                            <option key={v._id} value={v.name}>{v.name}</option>
+                          ))}
+                        </Select>
                       </div>
                       
                       <div className="ae-form-row">
@@ -1622,10 +1956,34 @@ const AdminEventDetail = () => {
                           <input type="text" name="resourcePerson" className="form-input" placeholder="External Speaker Name" value={formData.resourcePerson} onChange={handleInputChange} />
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Coordinator Contact Details</label>
-                          <input type="text" name="contactDetails" className="form-input" placeholder="Name & Contact number" value={formData.contactDetails} onChange={handleInputChange} />
+                          <label className="form-label">Designation</label>
+                          <input type="text" name="designation" className="form-input" placeholder="e.g., Professor, MIT" value={formData.designation} onChange={handleInputChange} />
                         </div>
                       </div>
+                      
+                      <div className="form-group">
+                        <label className="form-label">Resource Person Image</label>
+                        <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', border: '1.5px dashed var(--clr-border)', background: 'var(--clr-surface)', height: '42px', display: 'flex', alignItems: 'center', padding: '0 14px' }}>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleResourceImageUpload}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                          />
+                          <span style={{ fontSize: '0.85rem', color: formData.resourcePersonImage ? 'var(--clr-accent)' : 'var(--clr-text-muted)', fontWeight: formData.resourcePersonImage ? '600' : 'normal', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {formData.resourcePersonImage ? 'Image Uploaded ✓' : 'Click or Drag to Upload Image'}
+                          </span>
+                          {formData.resourcePersonImage && (
+                            <button 
+                              type="button" 
+                              style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--clr-danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                              onClick={(e) => { e.stopPropagation(); setFormData(prev => ({ ...prev, resourcePersonImage: '' })); }}
+                            >
+                              <X size={16} />
+                            </button>
+                          )}
+                        </div>
+                        </div>
                     </>
                   )}
                 </div>
@@ -1649,13 +2007,24 @@ const AdminEventDetail = () => {
                   <div className="ae-form-row">
                     <div className="form-group">
                       <label className="form-label">Max Members per Team</label>
-                      <input type="number" name="teamSizeLimit" className="form-input" min="1" max="12" value={formData.teamSizeLimit} onChange={handleInputChange} />
+                      <StepperInput 
+                        name="teamSizeLimit" 
+                        min={1} 
+                        max={12} 
+                        value={formData.teamSizeLimit} 
+                        onChange={handleInputChange} 
+                      />
                       <small className="text-muted">A team size of 1 denotes individual participation</small>
                     </div>
 
                     <div className="form-group">
                       <label className="form-label">Registrations Limit (Capacity)</label>
-                      <input type="number" name="maxShortlisted" className="form-input" min="0" value={formData.maxShortlisted} onChange={handleInputChange} />
+                      <StepperInput 
+                        name="maxShortlisted" 
+                        min={0} 
+                        value={formData.maxShortlisted || 0} 
+                        onChange={handleInputChange} 
+                      />
                       <small className="text-muted">0 means no limit on registrations</small>
                     </div>
                   </div>
@@ -2034,38 +2403,35 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Date</label>
-                      <input 
-                        type="date" 
-                        className="form-input" 
-                        name="date" 
+                      <DatePicker 
                         value={subEventFormData.date ? getLocalDateString(subEventFormData.date) : ''} 
                         onChange={handleSubEventInputChange} 
-                        required 
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Location / Venue</label>
-                      <input 
-                        type="text" 
-                        className="form-input" 
+                      <Select 
+                        className="form-select" 
                         name="location" 
-                        placeholder="e.g. Lab 3, Seminar Hall"
                         value={subEventFormData.location || ''} 
                         onChange={handleSubEventInputChange} 
                         required 
-                      />
+                      >
+                        <option value="" disabled>Select a Venue...</option>
+                        {venues.map(v => (
+                          <option key={v._id} value={v.name}>{v.name}</option>
+                        ))}
+                      </Select>
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Max Team Size</label>
-                      <input 
-                        type="number" 
-                        className="form-input" 
+                      <StepperInput 
                         name="teamSizeLimit" 
-                        min="1" 
-                        max="10" 
+                        min={1} 
+                        max={10} 
                         value={subEventFormData.teamSizeLimit || 4} 
                         onChange={handleSubEventInputChange} 
                       />
@@ -2087,11 +2453,9 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Max Shortlisted (0=∞)</label>
-                      <input 
-                        type="number" 
-                        className="form-input" 
+                      <StepperInput 
                         name="maxShortlisted" 
-                        min="0" 
+                        min={0} 
                         value={subEventFormData.maxShortlisted || 0} 
                         onChange={handleSubEventInputChange} 
                       />
@@ -2125,15 +2489,59 @@ const AdminEventDetail = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Contact Details</label>
+                      <label className="form-label">Designation</label>
                       <input 
                         type="text" 
                         className="form-input" 
-                        name="contactDetails" 
-                        placeholder="e.g. John (9876543210)"
-                        value={subEventFormData.contactDetails || ''} 
+                        name="designation" 
+                        placeholder="e.g. Professor, MIT"
+                        value={subEventFormData.designation || ''} 
                         onChange={handleSubEventInputChange} 
                       />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Resource Person Image</label>
+                    <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', border: '1.5px dashed var(--clr-border)', background: 'var(--clr-surface)', height: '42px', display: 'flex', alignItems: 'center', padding: '0 14px' }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            const img = new Image();
+                            img.onload = () => {
+                              const canvas = document.createElement('canvas');
+                              const MAX_WIDTH = 400;
+                              let width = img.width;
+                              let height = img.height;
+                              if (width > MAX_WIDTH) { height = height * (MAX_WIDTH / width); width = MAX_WIDTH; }
+                              canvas.width = width; canvas.height = height;
+                              const ctx = canvas.getContext('2d');
+                              ctx.drawImage(img, 0, 0, width, height);
+                              setSubEventFormData(prev => ({ ...prev, resourcePersonImage: canvas.toDataURL('image/jpeg', 0.8) }));
+                            };
+                            img.src = ev.target.result;
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                      />
+                      <span style={{ fontSize: '0.85rem', color: subEventFormData.resourcePersonImage ? 'var(--clr-accent)' : 'var(--clr-text-muted)', fontWeight: subEventFormData.resourcePersonImage ? '600' : 'normal', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {subEventFormData.resourcePersonImage ? 'Image Uploaded ✓' : 'Click or Drag to Upload Image'}
+                      </span>
+                      {subEventFormData.resourcePersonImage && (
+                        <button 
+                          type="button" 
+                          style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--clr-danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                          onClick={(e) => { e.stopPropagation(); setSubEventFormData(prev => ({ ...prev, resourcePersonImage: '' })); }}
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
                     </div>
                   </div>
 

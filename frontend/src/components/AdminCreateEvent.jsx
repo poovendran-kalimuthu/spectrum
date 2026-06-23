@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Loader from './Loader';
 import { API_URL } from '../config';
 import './AdminEvents.css';
@@ -16,7 +16,6 @@ import {
   XCircle,
   ArrowLeft,
   Plus,
-  Minus,
   X,
   FileText,
   MessageSquare,
@@ -67,19 +66,17 @@ const EMPTY_FORM = {
   category: 'None',
   macroCountLimit: 5,
   resourcePerson: '',
-  designation: '',
-  resourcePersonImage: '',
+  contactDetails: '',
   noOfDays: 1,
   dates: [],
-  coordinators: [],
-  roundConfig: [{ roundNumber: 1, name: 'Round 1', maxAdvance: 0, evaluationType: 'admin', criteria: [{ name: 'General Performance', maxScore: 100 }], assignedJudges: [] }]
+  coordinators: []
 };
 
 const WIZARD_STEPS = [
   { name: 'General Info', desc: 'Define your event\'s identity', sub: 'Add essential details like title, description, and hero image.' },
   { name: 'Schedule & Venue', desc: 'Set schedule & location', sub: 'Provide the date, location, and session slot for the event.' },
-  { name: 'Team & Evaluation', desc: 'Configure team & evaluation limits', sub: 'Set team sizes, shortlisting limits, rounds, and winners.' },
-  { name: 'Round Configurations', desc: 'Define round criteria', sub: 'Configure scoring criteria and advancement limits per round.' },
+  { name: 'Team Limits', desc: 'Configure team limits', sub: 'Set team size constraints and shortlisting limits.' },
+  { name: 'Evaluation Setup', desc: 'Define evaluation settings', sub: 'Configure the number of rounds and default winners.' },
   { name: 'Event Coordinators', desc: 'Assign event coordinators', sub: 'Add the organizers and volunteers managing this event.' },
   { name: 'Event Policies', desc: 'Establish event policies', sub: 'Specify attendance scanning modes and teammate edit rights.' },
   { name: 'Overview & Launch', desc: 'Review & Launch', sub: 'Inspect all configurations before publishing the event.' }
@@ -328,7 +325,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     const dayStr = String(day).padStart(2, '0');
     const formatted = `${year}-${month}-${dayStr}`;
     onChange({ target: { name: 'date', value: formatted } });
-    setTimeout(() => setIsOpen(false), 150);
+    setIsOpen(false);
   };
 
   const year = currentMonth.getFullYear();
@@ -362,26 +359,12 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
           required
           placeholder={placeholder}
           value={formatDateDisplay(value)}
-          className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
-          style={{ 
-            width: '100%', 
-            cursor: 'pointer', 
-            paddingRight: '40px',
-            borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
-            boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
-            transition: 'all var(--transition-base)'
-          }}
+          className="form-input datepicker-display-input"
+          style={{ width: '100%', cursor: 'pointer', paddingRight: '40px' }}
         />
         <CalendarIcon
           size={16}
-          style={{ 
-            position: 'absolute', 
-            right: '14px', 
-            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
-            transform: isOpen ? 'scale(1.15) translateY(-1px)' : 'scale(1) translateY(0)',
-            transition: 'all var(--transition-base)',
-            pointerEvents: 'none' 
-          }}
+          style={{ position: 'absolute', right: '14px', color: 'var(--clr-text-muted)', pointerEvents: 'none' }}
         />
       </div>
 
@@ -435,209 +418,6 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
   );
 };
 
-// --- Custom Clock TimePicker ---
-const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef(null);
-
-  // Parse initial 24h value to 12h state
-  let initHour = 9;
-  let initMin = 0;
-  let initAmPm = 'AM';
-  
-  if (value) {
-    const [h, m] = value.split(':');
-    let hr = parseInt(h);
-    initMin = parseInt(m);
-    if (hr >= 12) {
-      initAmPm = 'PM';
-      if (hr > 12) hr -= 12;
-    } else if (hr === 0) {
-      hr = 12;
-    }
-    initHour = hr;
-  }
-
-  const [hour, setHour] = useState(initHour);
-  const [minute, setMinute] = useState(initMin);
-  const [ampm, setAmPm] = useState(initAmPm);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleTimeChange = (h, m, ap) => {
-    let hr24 = h;
-    if (ap === 'PM' && h !== 12) hr24 += 12;
-    if (ap === 'AM' && h === 12) hr24 = 0;
-    
-    const hrStr = String(hr24).padStart(2, '0');
-    const minStr = String(m).padStart(2, '0');
-    
-    onChange({ target: { name, value: `${hrStr}:${minStr}` } });
-  };
-
-  const handleHourSelect = (h) => {
-    setHour(h);
-    handleTimeChange(h, minute, ampm);
-  };
-
-  const handleMinuteSelect = (m) => {
-    setMinute(m);
-    handleTimeChange(hour, m, ampm);
-  };
-
-  const handleAmPmSelect = (ap) => {
-    setAmPm(ap);
-    handleTimeChange(hour, minute, ap);
-  };
-
-  const formatDisplay = () => {
-    if (!value) return '';
-    return `${hour}:${String(minute).padStart(2, '0')} ${ampm}`;
-  };
-
-  return (
-    <div className="custom-datepicker" ref={containerRef}>
-      <div
-        className="datepicker-input-wrapper"
-        onClick={() => setIsOpen(!isOpen)}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
-      >
-        <input
-          type="text"
-          readOnly
-          placeholder={placeholder}
-          value={formatDisplay()}
-          className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
-          style={{ 
-            width: '100%', 
-            cursor: 'pointer', 
-            paddingRight: '40px',
-            borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
-            boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
-            transition: 'all var(--transition-base)'
-          }}
-        />
-        <Clock
-          size={16}
-          style={{ 
-            position: 'absolute', 
-            right: '14px', 
-            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
-            transform: isOpen ? 'scale(1.15) rotate(15deg)' : 'scale(1) rotate(0deg)',
-            transition: 'all var(--transition-base)',
-            pointerEvents: 'none' 
-          }}
-        />
-      </div>
-
-      {isOpen && (
-        <div className="datepicker-popover glass-strong" style={{ width: '280px', padding: '1rem', zIndex: 1000 }}>
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-            <button 
-              type="button" 
-              onClick={() => handleAmPmSelect('AM')}
-              style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'AM' ? '#0f172a' : '#f8fafc', color: ampm === 'AM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
-            >
-              AM
-            </button>
-            <button 
-              type="button" 
-              onClick={() => handleAmPmSelect('PM')}
-              style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'PM' ? '#0f172a' : '#f8fafc', color: ampm === 'PM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
-            >
-              PM
-            </button>
-          </div>
-
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hour</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px', marginBottom: '1.25rem' }}>
-            {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
-              <button
-                key={h}
-                type="button"
-                onClick={() => handleHourSelect(h)}
-                style={{ 
-                  padding: '6px 0', 
-                  borderRadius: '4px', 
-                  fontSize: '0.8rem', 
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: hour === h ? '#0f172a' : 'transparent',
-                  color: hour === h ? '#fff' : '#0f172a',
-                  border: hour === h ? '1px solid #0f172a' : '1px solid #e2e8f0',
-                  transition: 'all var(--transition-fast)'
-                }}
-              >
-                {h}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Minute</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '1.25rem' }}>
-            {[0, 15, 30, 45].map(m => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => handleMinuteSelect(m)}
-                style={{ 
-                  padding: '6px 0', 
-                  borderRadius: '4px', 
-                  fontSize: '0.8rem', 
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: minute === m ? '#0f172a' : 'transparent',
-                  color: minute === m ? '#fff' : '#0f172a',
-                  border: minute === m ? '1px solid #0f172a' : '1px solid #e2e8f0',
-                  transition: 'all var(--transition-fast)'
-                }}
-              >
-                {String(m).padStart(2, '0')}
-              </button>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setTimeout(() => setIsOpen(false), 150);
-            }}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: '#0f172a',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              transition: 'all var(--transition-base)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#000000'}
-            onMouseOut={(e) => e.currentTarget.style.background = '#0f172a'}
-          >
-            Confirm Time
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
 // --- Premium Toast Notification Component ---
 const PremiumToast = ({ toast, onClose }) => {
   if (!toast || !toast.text) return null;
@@ -662,64 +442,9 @@ const PremiumToast = ({ toast, onClose }) => {
   );
 };
 
-// --- Premium Number Stepper Component ---
-const StepperInput = ({ value, onChange, name, min = 0, max = Infinity, placeholder = "" }) => {
-  const handleDecrement = () => {
-    const val = Math.max(min, (parseInt(value) || 0) - 1);
-    onChange({ target: { name, value: val, type: 'number' } });
-  };
-  const handleIncrement = () => {
-    const val = Math.min(max, (parseInt(value) || 0) + 1);
-    onChange({ target: { name, value: val, type: 'number' } });
-  };
-  const handleChange = (e) => {
-    let val = parseInt(e.target.value);
-    if (isNaN(val)) val = '';
-    onChange({ target: { name, value: val, type: 'number' } });
-  };
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', background: 'var(--clr-surface)', border: '1.5px solid var(--clr-border)', borderRadius: '10px', overflow: 'hidden', height: '42px', transition: 'all var(--transition-base)' }}>
-      <button 
-        type="button" 
-        onClick={handleDecrement}
-        style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderRight: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
-        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
-        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--clr-text-muted)'; }}
-      >
-        <Minus size={16} />
-      </button>
-      <input 
-        type="text" 
-        name={name}
-        value={value} 
-        onChange={handleChange}
-        placeholder={placeholder}
-        style={{ flex: 1, height: '100%', border: 'none', textAlign: 'center', background: 'transparent', fontWeight: 600, color: 'var(--clr-text-heading)', fontSize: '0.9rem', outline: 'none' }}
-      />
-      <button 
-        type="button" 
-        onClick={handleIncrement}
-        style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderLeft: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
-        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
-        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--clr-text-muted)'; }}
-      >
-        <Plus size={16} />
-      </button>
-    </div>
-  );
-};
-
 const AdminEvents = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const isCreateRoute = location.pathname.includes('/create');
-  const queryParams = new URLSearchParams(location.search);
-  const typeParam = queryParams.get('type');
-  const showModalParam = queryParams.get('modal') === 'true';
-
   const [events, setEvents] = useState([]);
-  const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -728,16 +453,6 @@ const AdminEvents = () => {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ text: '', type: '' });
   const [formData, setFormData] = useState(EMPTY_FORM);
-
-  useEffect(() => {
-    if (!formData.roundConfig) {
-      setFormData(prev => ({
-        ...prev,
-        roundConfig: [{ roundNumber: 1, name: 'Round 1', maxAdvance: 0, evaluationType: 'admin', criteria: [{ name: 'General Performance', maxScore: 100 }], assignedJudges: [] }]
-      }));
-    }
-  }, [formData.roundConfig]);
-
   const [step, setStep] = useState(1);
   const [activeMenuId, setActiveMenuId] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null); // { eventId, type, message, actionFn }
@@ -773,25 +488,6 @@ const AdminEvents = () => {
     fetchEvents();
   }, []);
 
-  // Route-based state sync
-  useEffect(() => {
-    if (isCreateRoute) {
-      setShowCreateForm(true);
-      setShowEventTypeModal(false);
-      if (typeParam && formData.eventType !== typeParam) {
-        setFormData({ ...EMPTY_FORM, eventType: typeParam });
-        setStep(1);
-      }
-    } else {
-      setShowCreateForm(false);
-      if (showModalParam) {
-        setShowEventTypeModal(true);
-        // Clear param without reload
-        navigate('/admin/events', { replace: true });
-      }
-    }
-  }, [isCreateRoute, typeParam, showModalParam, navigate]);
-
   // Lock body scroll when modals are open
   useEffect(() => {
     if (showEventTypeModal || showCreateForm || confirmAction) {
@@ -814,14 +510,10 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const [eventsRes, venuesRes] = await Promise.all([
-        axios.get(`${API_URL}/api/admin/events`, { withCredentials: true }),
-        axios.get(`${API_URL}/api/venues`, { withCredentials: true })
-      ]);
-      if (eventsRes.data.success) setEvents(eventsRes.data.events);
-      if (venuesRes.data.success) setVenues(venuesRes.data.venues);
+      const res = await axios.get(`${API_URL}/api/admin/events`, { withCredentials: true });
+      if (res.data.success) setEvents(res.data.events);
     } catch (err) {
-      setError(err.response?.status === 403 ? 'Access Denied. Admin privileges required.' : 'Failed to load data.');
+      setError(err.response?.status === 403 ? 'Access Denied. Admin privileges required.' : 'Failed to load events.');
     } finally { setLoading(false); }
   };
 
@@ -914,22 +606,6 @@ const AdminEvents = () => {
     let { name, value, type, checked } = e.target;
     let val = type === 'checkbox' ? checked : value;
     if (type === 'number') val = parseInt(value) || 0;
-
-    if (name === 'rounds') {
-      setFormData(prev => {
-        let newConfig = [...(prev.roundConfig || [])];
-        if (val > newConfig.length) {
-          for (let i = newConfig.length; i < val; i++) {
-            newConfig.push({ roundNumber: i + 1, name: `Round ${i + 1}`, maxAdvance: 0, evaluationType: 'admin', criteria: [{ name: 'General Performance', maxScore: 100 }], assignedJudges: [] });
-          }
-        } else if (val < newConfig.length) {
-          newConfig = newConfig.slice(0, val);
-        }
-        return { ...prev, rounds: val, roundConfig: newConfig };
-      });
-      return;
-    }
-
     setFormData(f => ({ ...f, [name]: val }));
   };
 
@@ -958,37 +634,6 @@ const AdminEvents = () => {
 
         const base64Str = canvas.toDataURL('image/jpeg', 0.8);
         setFormData(f => ({ ...f, imageUrl: base64Str }));
-      };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleResourceImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX_WIDTH = 400; // Profile pic size
-        let width = img.width;
-        let height = img.height;
-
-        if (width > MAX_WIDTH) {
-          height = height * (MAX_WIDTH / width);
-          width = MAX_WIDTH;
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const base64Str = canvas.toDataURL('image/jpeg', 0.8);
-        setFormData(f => ({ ...f, resourcePersonImage: base64Str }));
       };
       img.src = event.target.result;
     };
@@ -1046,11 +691,17 @@ const AdminEvents = () => {
   const submitWizard = async () => {
     setSubmitting(true);
     try {
-      
+      const defaultRoundConfig = Array.from({ length: formData.rounds }, (_, idx) => ({
+        roundNumber: idx + 1,
+        name: `Round ${idx + 1}`,
+        evaluationType: 'admin',
+        criteria: [{ name: 'Overall', maxScore: 10 }],
+        maxAdvance: 0
+      }));
 
       const submitData = {
         ...formData,
-        roundConfig: formData.roundConfig
+        roundConfig: defaultRoundConfig
       };
 
       const res = await axios.post(`${API_URL}/api/admin/events`, submitData, { withCredentials: true });
@@ -1116,7 +767,9 @@ const AdminEvents = () => {
               className={`btn ${showCreateForm ? 'btn-ghost' : 'btn-primary'}`}
               onClick={() => {
                 if (showCreateForm) {
-                  navigate('/admin/events');
+                  setShowCreateForm(false);
+                  setFormData(EMPTY_FORM);
+                  setStep(1);
                 } else {
                   setShowEventTypeModal(true);
                 }
@@ -1252,8 +905,13 @@ const AdminEvents = () => {
                     <div
                       key={item.id}
                       onClick={() => {
+                        setFormData({
+                          ...EMPTY_FORM,
+                          eventType: item.id,
+                        });
                         setShowEventTypeModal(false);
-                        navigate(`/admin/events/create?type=${item.id}`);
+                        setShowCreateForm(true);
+                        setStep(1);
                       }}
                       style={{
                         border: '1.5px solid var(--clr-border)',
@@ -1319,7 +977,8 @@ const AdminEvents = () => {
                 type="button"
                 onClick={() => {
                   if (window.confirm('Discard event draft? Your progress will be lost.')) {
-                    navigate('/admin/events');
+                    setShowCreateForm(false);
+                    setStep(1);
                   }
                 }}
                 style={{
@@ -1387,54 +1046,37 @@ const AdminEvents = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: (formData.eventType !== 'macro' && events.filter(e => e.eventType === 'macro').length > 0) ? '1fr 1fr' : '1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Hero Image URL (Optional)</label>
-                      <input
-                        className="form-input"
-                        type="text"
-                        name="imageUrl"
-                        value={formData.imageUrl}
-                        onChange={handleInputChange}
-                        placeholder="Paste external image URL here"
-                        style={{ width: '100%', borderRadius: '10px' }}
-                      />
-                    </div>
-
-                    {formData.eventType !== 'macro' && events.filter(e => e.eventType === 'macro').length > 0 && (
-                      <div className="form-group" style={{ margin: 0 }}>
-                        <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Parent Macro Event (Optional)</label>
-                        <Select className="form-select" name="parentEvent" value={formData.parentEvent || ''} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
-                          <option value="">None (Standalone)</option>
-                          {events
-                            .filter(e => e.eventType === 'macro')
-                            .map(macro => (
-                              <option key={macro._id} value={macro._id}>{macro.title}</option>
-                            ))
-                          }
-                        </Select>
-                      </div>
-                    )}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Hero Image URL (Optional)</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      name="imageUrl"
+                      value={formData.imageUrl}
+                      onChange={handleInputChange}
+                      placeholder="Paste external image URL here"
+                      style={{ width: '100%', borderRadius: '10px' }}
+                    />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: formData.eventType === 'macro' ? '1fr' : '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>
-                        {formData.eventType === 'macro' ? 'Macro Event Title *' : 'Event Title *'}
-                      </label>
-                      <input
-                        className="form-input"
-                        type="text"
-                        name="title"
-                        required
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        placeholder={formData.eventType === 'macro' ? "e.g., Helix '26 Flagship" : "e.g., E-sports Gaming Tournament"}
-                        style={{ width: '100%', borderRadius: '10px' }}
-                      />
-                    </div>
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>
+                      {formData.eventType === 'macro' ? 'Macro Event Title *' : 'Event Title *'}
+                    </label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      name="title"
+                      required
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      placeholder={formData.eventType === 'macro' ? "e.g., Helix '26 Flagship" : "e.g., E-sports Gaming Tournament"}
+                      style={{ width: '100%', borderRadius: '10px' }}
+                    />
+                  </div>
 
-                    {formData.eventType !== 'macro' && (
+                  {formData.eventType !== 'macro' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
                       <div className="form-group" style={{ margin: 0 }}>
                         <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Event Category *</label>
                         <Select className="form-select" name="category" value={formData.category || 'None'} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
@@ -1444,8 +1086,23 @@ const AdminEvents = () => {
                           <option value="Non-Technical">Non-Technical</option>
                         </Select>
                       </div>
-                    )}
-                  </div>
+
+                      {events.filter(e => e.eventType === 'macro').length > 0 && (
+                        <div className="form-group" style={{ margin: 0 }}>
+                          <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Parent Macro Event (Optional)</label>
+                          <Select className="form-select" name="parentEvent" value={formData.parentEvent || ''} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
+                            <option value="">None (Standalone)</option>
+                            {events
+                              .filter(e => e.eventType === 'macro')
+                              .map(macro => (
+                                <option key={macro._id} value={macro._id}>{macro.title}</option>
+                              ))
+                            }
+                          </Select>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {formData.eventType === 'macro' && (
                     <>
@@ -1546,48 +1203,29 @@ const AdminEvents = () => {
                     </div>
 
                     <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Session Window *</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ flex: 1 }}>
-                          <TimePicker 
-                            name="session-start"
-                            value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00'} 
-                            onChange={(e) => {
-                              const end = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00';
-                              handleInputChange({ target: { name: 'session', value: `${e.target.value || '09:00'} - ${end}` } });
-                            }}
-                          />
-                        </div>
-                        <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>TO</span>
-                        <div style={{ flex: 1 }}>
-                          <TimePicker 
-                            name="session-end"
-                            value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00'} 
-                            onChange={(e) => {
-                              const start = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00';
-                              handleInputChange({ target: { name: 'session', value: `${start} - ${e.target.value || '13:00'}` } });
-                            }}
-                          />
-                        </div>
-                      </div>
+                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Session Slot</label>
+                      <Select className="form-select" name="session" value={formData.session} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
+                        <option value="none">No Session (Generic)</option>
+                        <option value="day1_morning">Day 1: 9:00 AM - 1:00 PM</option>
+                        <option value="day1_afternoon">Day 1: 2:00 PM - 4:00 PM</option>
+                        <option value="day2_morning">Day 2: 9:00 AM - 1:00 PM</option>
+                      </Select>
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
                     <div className="form-group" style={{ margin: 0 }}>
                       <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Location *</label>
-                      <Select
+                      <input
+                        className="form-input"
+                        type="text"
                         name="location"
                         required
                         value={formData.location}
                         onChange={handleInputChange}
+                        placeholder="e.g., Seminar Hall II"
                         style={{ width: '100%', borderRadius: '10px' }}
-                      >
-                        <option value="" disabled>Select a Venue...</option>
-                        {venues.map(v => (
-                          <option key={v._id} value={v.name}>{v.name}</option>
-                        ))}
-                      </Select>
+                      />
                     </div>
 
                     <div className="form-group" style={{ margin: 0 }}>
@@ -1604,47 +1242,22 @@ const AdminEvents = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Designation</label>
-                      <input
-                        className="form-input"
-                        type="text"
-                        name="designation"
-                        value={formData.designation || ''}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Professor, MIT"
-                        style={{ width: '100%', borderRadius: '10px' }}
-                      />
-                    </div>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Resource Person Image</label>
-                      <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', border: '1.5px dashed var(--clr-border)', background: 'var(--clr-surface)', height: '42px', display: 'flex', alignItems: 'center', padding: '0 14px' }}>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleResourceImageUpload}
-                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                        />
-                        <span style={{ fontSize: '0.85rem', color: formData.resourcePersonImage ? 'var(--clr-accent)' : 'var(--clr-text-muted)', fontWeight: formData.resourcePersonImage ? '600' : 'normal', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {formData.resourcePersonImage ? 'Image Uploaded ✓' : 'Click or Drag to Upload Image'}
-                        </span>
-                        {formData.resourcePersonImage && (
-                          <button 
-                            type="button" 
-                            style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--clr-danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                            onClick={(e) => { e.stopPropagation(); setFormData(prev => ({ ...prev, resourcePersonImage: '' })); }}
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Contact Details</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      name="contactDetails"
+                      value={formData.contactDetails || ''}
+                      onChange={handleInputChange}
+                      placeholder="e.g., John (9876543210), Sarah (8765432109)"
+                      style={{ width: '100%', borderRadius: '10px' }}
+                    />
                   </div>
                 </>
               )}
 
-              {/* Step 3: Team & Evaluation Limits */}
+              {/* Step 3: Team Limits */}
               {step === 3 && (
                 <>
                   <div className="ae-wizard-banner">
@@ -1660,53 +1273,35 @@ const AdminEvents = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
                     <div className="form-group" style={{ margin: 0 }}>
                       <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Max Team Size *</label>
-                      <StepperInput
+                      <input
+                        className="form-input"
+                        type="number"
                         name="teamSizeLimit"
-                        min={1}
-                        max={10}
+                        min="1"
+                        max="10"
                         value={formData.teamSizeLimit}
                         onChange={handleInputChange}
+                        style={{ width: '100%', borderRadius: '10px' }}
                       />
                     </div>
 
                     <div className="form-group" style={{ margin: 0 }}>
                       <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Max Shortlisted Teams (0 = No Limit) *</label>
-                      <StepperInput
+                      <input
+                        className="form-input"
+                        type="number"
                         name="maxShortlisted"
-                        min={0}
-                        value={formData.maxShortlisted || 0}
+                        min="0"
+                        value={formData.maxShortlisted}
                         onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Number of Rounds *</label>
-                      <StepperInput
-                        name="rounds"
-                        min={1}
-                        max={10}
-                        value={formData.rounds}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Number of Winners *</label>
-                      <StepperInput
-                        name="numberOfWinners"
-                        min={1}
-                        value={formData.numberOfWinners}
-                        onChange={handleInputChange}
+                        style={{ width: '100%', borderRadius: '10px' }}
                       />
                     </div>
                   </div>
                 </>
               )}
 
-              
-              {/* Step 4: Round Configurations */}
+              {/* Step 4: Evaluation Setup */}
               {step === 4 && (
                 <>
                   <div className="ae-wizard-banner">
@@ -1719,62 +1314,39 @@ const AdminEvents = () => {
                     </div>
                   </div>
 
-                  <div className="ae-rounds-builder">
-                    {formData.roundConfig && formData.roundConfig.map((rc, rIdx) => (
-                      <div key={rIdx} className="ae-round-card">
-                        <div className="ae-round-header">
-                          <h4>Round {rc.roundNumber} Configuration</h4>
-                          <span className="ae-badge accent">R{rc.roundNumber}</span>
-                        </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Number of Rounds *</label>
+                      <input
+                        className="form-input"
+                        type="number"
+                        name="rounds"
+                        min="1"
+                        max="10"
+                        value={formData.rounds}
+                        onChange={handleInputChange}
+                        style={{ width: '100%', borderRadius: '10px' }}
+                      />
+                    </div>
 
-                        <div className="ae-form" style={{ gap: '0.85rem' }}>
-                          <div className="ae-form-row">
-                            <div className="form-group">
-                              <label className="form-label">Round Custom Name</label>
-                              <input type="text" className="form-input" placeholder={`e.g. Preliminary Quiz / Final Pitch`} value={rc.name} onChange={(e) => handleRoundConfigChange(rIdx, 'name', e.target.value)} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">Advancement Capacity Limit</label>
-                              <input type="number" className="form-input" placeholder="0 (No Limit)" min="0" value={rc.maxAdvance || 0} onChange={(e) => handleRoundConfigChange(rIdx, 'maxAdvance', parseInt(e.target.value) || 0)} />
-                              <small className="text-muted">Max teams allowed to advance past this round</small>
-                            </div>
-                          </div>
-
-                          <div className="ae-form-row">
-                            <div className="form-group">
-                              <label className="form-label">Evaluation Type</label>
-                              <Select className="form-select" value={rc.evaluationType} onChange={(e) => handleRoundConfigChange(rIdx, 'evaluationType', e.target.value)}>
-                                <option value="admin">Internal Admin Panel Grading</option>
-                                <option value="jury">External Jury Portal (using Pins)</option>
-                              </Select>
-                            </div>
-                          </div>
-
-                          <div className="ae-criteria-section">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                              <label className="form-label" style={{ marginBottom: 0 }}>Scoring Criteria</label>
-                              <button type="button" className="btn btn-ghost btn-xs text-accent" onClick={() => handleAddCriteria(rIdx)}>+ Add Criterion</button>
-                            </div>
-
-                            {rc.criteria.map((cr, cIdx) => (
-                              <div key={cIdx} className="ae-criteria-row">
-                                <input type="text" className="form-input" placeholder="Criterion Name (e.g. Innovation)" value={cr.name} onChange={(e) => handleCriteriaChange(rIdx, cIdx, 'name', e.target.value)} style={{ flex: 2 }} />
-                                <input type="number" className="form-input" min="1" max="100" value={cr.maxScore} onChange={(e) => handleCriteriaChange(rIdx, cIdx, 'maxScore', parseInt(e.target.value) || 10)} style={{ flex: 1 }} />
-                                {rc.criteria.length > 1 && (
-                                  <button type="button" className="btn btn-ghost btn-xs text-danger" onClick={() => handleRemoveCriteria(rIdx, cIdx)}><X size={14} /></button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'block' }}>Number of Winners *</label>
+                      <input
+                        className="form-input"
+                        type="number"
+                        name="numberOfWinners"
+                        min="1"
+                        value={formData.numberOfWinners}
+                        onChange={handleInputChange}
+                        style={{ width: '100%', borderRadius: '10px' }}
+                      />
+                    </div>
                   </div>
                 </>
               )}
 
               {/* Step 5: Event Coordinators */}
-              {step === 7 && (
+              {step === 5 && (
                 <>
                   <div className="ae-wizard-banner" style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #9f67fa 100%)' }}>
                     <div className="ae-wizard-banner-icon">
@@ -1880,7 +1452,7 @@ const AdminEvents = () => {
               )}
 
               {/* Step 6: Event Policies */}
-              {step === 7 && (
+              {step === 6 && (
                 <>
                   <div className="ae-wizard-banner">
                     <div className="ae-wizard-banner-icon">
@@ -1932,10 +1504,10 @@ const AdminEvents = () => {
                     </div>
                     <div className="ae-wizard-banner-text">
                       <span className="ae-wizard-banner-title">
-                        {formData.eventType === 'macro' ? MACRO_WIZARD_STEPS[1].desc : WIZARD_STEPS[5].desc}
+                        {formData.eventType === 'macro' ? MACRO_WIZARD_STEPS[1].desc : WIZARD_STEPS[6].desc}
                       </span>
                       <span className="ae-wizard-banner-desc">
-                        {formData.eventType === 'macro' ? MACRO_WIZARD_STEPS[1].sub : WIZARD_STEPS[5].sub}
+                        {formData.eventType === 'macro' ? MACRO_WIZARD_STEPS[1].sub : WIZARD_STEPS[6].sub}
                       </span>
                     </div>
                   </div>
@@ -2038,7 +1610,8 @@ const AdminEvents = () => {
                   className="btn btn-secondary btn-sm"
                   onClick={() => {
                     if (step === 1) {
-                      navigate('/admin/events?modal=true');
+                      setShowCreateForm(false);
+                      setShowEventTypeModal(true);
                     } else {
                       handlePrevStep();
                     }
@@ -2067,40 +1640,35 @@ const AdminEvents = () => {
             </div>
 
             {/* Stepper Right Side */}
-            <div className="ae-wizard-stepper-wrapper">
-              <div className="ae-wizard-stepper">
-                {(formData.eventType === 'macro' ? MACRO_WIZARD_STEPS : WIZARD_STEPS).map((s, idx) => {
-                  const stepNum = idx + 1;
-                  const isActive = step === stepNum;
-                  const isCompleted = step > stepNum;
-                  return (
-                    <div
-                      key={idx}
-                      className={`ae-stepper-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-                      onClick={() => {
-                        if (isCompleted || stepNum < step) {
-                          setStep(stepNum);
-                        }
-                      }}
-                      style={{ cursor: (isCompleted || stepNum < step) ? 'pointer' : 'default' }}
-                    >
-                      <span className="ae-stepper-title">
-                        Step {stepNum}/{formData.eventType === 'macro' ? 2 : 7} {isCompleted && '\u2713'}
-                      </span>
-                      <span className="ae-stepper-desc">{s.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="ae-wizard-stepper">
+              {(formData.eventType === 'macro' ? MACRO_WIZARD_STEPS : WIZARD_STEPS).map((s, idx) => {
+                const stepNum = idx + 1;
+                const isActive = step === stepNum;
+                const isCompleted = step > stepNum;
+                return (
+                  <div
+                    key={idx}
+                    className={`ae-stepper-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                    onClick={() => {
+                      if (isCompleted || stepNum < step) {
+                        setStep(stepNum);
+                      }
+                    }}
+                    style={{ cursor: (isCompleted || stepNum < step) ? 'pointer' : 'default' }}
+                  >
+                    <span className="ae-stepper-title">
+                      Step {stepNum}/{formData.eventType === 'macro' ? 2 : 7} {isCompleted && '\u2713'}
+                    </span>
+                    <span className="ae-stepper-desc">{s.name}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* Conditionally hide the list view when creating */}
-      {!isCreateRoute && (
-        <>
-          {loading ? (
+      {loading ? (
         <div style={{ padding: '6rem 0' }}>
           <Loader text="Loading your event command center..." />
         </div>
@@ -2292,8 +1860,6 @@ const AdminEvents = () => {
             );
           })}
         </div>
-      )}
-      </>
       )}
     </div>
   );

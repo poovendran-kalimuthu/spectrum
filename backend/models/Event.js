@@ -26,7 +26,7 @@ const eventSchema = new mongoose.Schema({
   roundConfig: [roundConfigSchema],               // per-round evaluation config
   maxShortlisted: { type: Number, default: 0 },   // 0 means no limit
   numberOfWinners: { type: Number, default: 3 },  // How many winners to select
-  session: { type: String, enum: ['none', 'day1_morning', 'day1_afternoon', 'day2_morning'], default: 'none' },
+  session: { type: String, default: 'none' },
   imageUrl: { type: String },
   isPublished: { type: Boolean, default: false },
   isRegistrationOpen: { type: Boolean, default: true },
@@ -47,7 +47,8 @@ const eventSchema = new mongoose.Schema({
   category: { type: String, enum: ['Technical', 'Workshop', 'Non-Technical', 'None'], default: 'None' },
   macroCountLimit: { type: Number, default: 0 },
   resourcePerson: { type: String, default: '' },
-  contactDetails: { type: String, default: '' },
+  designation: { type: String, default: '' },
+  resourcePersonImage: { type: String, default: '' },
   coordinators: [{
     name: { type: String },
     email: { type: String },
