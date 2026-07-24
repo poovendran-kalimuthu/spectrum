@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import { API_URL } from '../config';
 import { MapPin, Clock, Layers } from 'lucide-react';
 import './EventsList.css';
@@ -87,11 +88,11 @@ const EventsList = () => {
             <Loader text="Loading events..." />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="el-empty animate-fade-in">
-            <span>🔍</span>
-            <h3>{search ? 'No events match your search' : 'No events published yet'}</h3>
-            <p>{search ? 'Try a different keyword' : 'Check back later!'}</p>
-          </div>
+          <EmptyState
+            variant={search ? 'events-search' : 'events'}
+            title={search ? 'No events match your search' : 'No events published yet'}
+            subtitle={search ? 'Try a different keyword or clear the search.' : 'Check back later for upcoming events!'}
+          />
         ) : (
           <div className="evc-grid animate-fade-in-up">
             {filtered.map((ev) => {

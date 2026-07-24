@@ -206,6 +206,29 @@ export const deleteDocument = async (req, res) => {
   }
 };
 
+// Download a document (forces browser to save, not open)
+export const downloadDocument = async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id);
+    if (!doc) return res.status(404).json({ success: false, message: 'Document not found' });
+
+    const filename = doc.fileUrl.replace('/uploads/', '');
+    const filepath  = path.join('uploads', filename);
+
+    if (!fs.existsSync(filepath)) {
+      return res.status(404).json({ success: false, message: 'File not found on server' });
+    }
+
+    const downloadName = `${doc.title.replace(/[^a-z0-9_\-\.]/gi, '_')}.pdf`;
+    res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.sendFile(path.resolve(filepath));
+  } catch (err) {
+    console.error('Download Document Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // All Documents: Approved docs + docs uploaded without approvers (auto-approved)
 export const getPublicDocuments = async (req, res) => {
   try {

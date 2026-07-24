@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
+import Loader from './Loader';
 import { 
   Users, 
   Calendar, 
@@ -227,9 +228,8 @@ const AdminOverview = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] gap-4 text-[var(--clr-text-muted)]">
-        <div className="loader-spinner"></div>
-        <p>Loading Dashboard Analytics...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
+        <Loader text="Loading Dashboard Analytics..." />
       </div>
     );
   }

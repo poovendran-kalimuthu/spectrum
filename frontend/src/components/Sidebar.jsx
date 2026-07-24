@@ -40,6 +40,7 @@ import {
   BarChart2,
   AlertTriangle,
   Filter,
+  DollarSign,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -131,6 +132,14 @@ const NAV_STRUCTURE = (role, pendingApprovalsCount = 0) => {
             { key: '/admin/documents?tab=approvals', label: 'Approvals', icon: TicketCheck, badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : null },
           ],
         },
+        {
+          key: '/admin/finance',
+          label: 'Finance',
+          icon: DollarSign,
+          sub: [
+            { key: '/admin/finance', label: 'Overview' },
+          ],
+        },
       ],
     }] : []),
     // ── Misc ──
@@ -150,10 +159,9 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // collapsed = icon-only rail; open = full expanded (mobile drawer too)
-  const [collapsed, setCollapsed] = useState(false);
+  // Sidebar defaults to icon rail, expands on hover
+  const collapsed = true;
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openSubs, setOpenSubs] = useState({});
   const [serverStatus, setServerStatus] = useState('online');
   const sidebarRef = useRef(null);
 
@@ -161,8 +169,8 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
   useEffect(() => {
     onCollapse?.(collapsed);
     // update CSS var so main content shifts correctly
-    document.documentElement.style.setProperty('--sb-width', collapsed ? '64px' : '260px');
-  }, [collapsed]);
+    document.documentElement.style.setProperty('--sb-width', '64px');
+  }, []);
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -199,8 +207,6 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
     navigate({ pathname: path, search: search ? `?${search}` : '' });
   };
 
-  const toggleSub = (key) => setOpenSubs((prev) => ({ ...prev, [key]: !prev[key] }));
-
   const formatRole = (role) => {
     const map = { superadmin: 'Super Admin', admin_t1: 'Admin T1', admin_t2: 'Admin T2', mentor: 'Mentor', user: 'Student' };
     return map[role] || role || 'Student';
@@ -209,6 +215,17 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
   const handleLogout = () => { window.location.href = `${API_URL}/api/auth/logout`; };
 
   const [isHovered, setIsHovered] = useState(false);
+  const hoverTimerRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setIsHovered(true), 220);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setIsHovered(false), 180);
+  };
 
   const navStructure = NAV_STRUCTURE(user?.role, pendingApprovalsCount);
 
@@ -233,8 +250,8 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
 
       <aside
         ref={sidebarRef}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={`sp-sidebar ${effectivelyCollapsed ? 'sp-collapsed' : ''} ${mobileOpen ? 'sp-mobile-open' : ''} ${collapsed && isHovered ? 'sp-hover-expanded' : ''}`}
       >
         {/* ── Logo + collapse toggle ── */}
@@ -247,15 +264,6 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
             </div>
             {showLabels && <span className="sb-logo-text">Spectrum</span>}
           </div>
-
-          {/* Desktop collapse toggle */}
-          <button
-            className="sb-collapse-btn desktop-only"
-            onClick={() => setCollapsed((c) => !c)}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
-          </button>
 
           {/* Mobile close button */}
           <button
@@ -282,20 +290,12 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
                 const Icon = item.icon;
                 const active = isActive(item.key);
                 const hasSub = item.sub?.length > 0;
-                const subOpen = openSubs[item.key];
 
                 return (
                   <div key={item.key} className="sb-item-wrap">
                     <button
                       className={`sb-item ${active ? 'active' : ''} ${hasSub ? 'has-sub' : ''}`}
-                      onClick={() => {
-                        if (hasSub) {
-                          if (!collapsed) toggleSub(item.key);
-                          else { setCollapsed(false); toggleSub(item.key); }
-                        } else {
-                          handleNavigation(item.key);
-                        }
-                      }}
+                      onClick={() => handleNavigation(item.key)}
                       title={collapsed ? item.label : undefined}
                     >
                       <span className="sb-item-left">
@@ -304,7 +304,7 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
                       </span>
                       {showLabels && hasSub && (
                         <span className="sb-chevron">
-                          {subOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+                          <ChevronRight size={13} />
                         </span>
                       )}
                       {showLabels && item.badge !== undefined && item.badge !== null && (
@@ -318,26 +318,28 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
                     </button>
 
                     {/* Sub items */}
-                    {hasSub && showLabels && subOpen && (
-                      <div className="sb-sub-list">
-                        {item.sub.map((sub) => {
-                          const SubIcon = sub.icon;
-                          return (
-                            <button
-                              key={sub.key}
-                              className={`sb-sub-item ${isActive(sub.key) ? 'active' : ''}`}
-                              onClick={() => handleNavigation(sub.key)}
-                            >
-                              {SubIcon
-                                ? <SubIcon size={13} className="sb-sub-icon" />
-                                : <span className="sb-sub-dot" />}
-                              <span className="sb-sub-label">{sub.label}</span>
-                              {sub.badge != null && (
-                                <span className="sb-badge">{sub.badge}</span>
-                              )}
-                            </button>
-                          );
-                        })}
+                    {hasSub && showLabels && (
+                      <div className="sb-sub-list-container">
+                        <div className="sb-sub-list">
+                          {item.sub.map((sub) => {
+                            const SubIcon = sub.icon;
+                            return (
+                              <button
+                                key={sub.key}
+                                className={`sb-sub-item ${isActive(sub.key) ? 'active' : ''}`}
+                                onClick={() => handleNavigation(sub.key)}
+                              >
+                                {SubIcon
+                                  ? <SubIcon size={13} className="sb-sub-icon" />
+                                  : <span className="sb-sub-dot" />}
+                                <span className="sb-sub-label">{sub.label}</span>
+                                {sub.badge != null && (
+                                  <span className="sb-badge">{sub.badge}</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
 
@@ -404,23 +406,7 @@ const Sidebar = ({ user, onCollapse, pendingApprovalsCount = 0 }) => {
             </div>
           )}
 
-          <div className={`sb-status ${showLabels ? '' : 'icon-only'}`} title={collapsed ? 'System Online' : undefined}>
-            <div className={`sb-status-dot ${serverStatus}`} />
-            {showLabels && (
-              <>
-                <span className="sb-status-text">
-                  {serverStatus === 'online' ? 'System Online' : serverStatus === 'offline' ? 'Offline' : 'Checking...'}
-                </span>
-                <button
-                  className="sb-refresh-btn"
-                  onClick={() => { setServerStatus('checking'); setTimeout(() => setServerStatus('online'), 600); }}
-                >
-                  <RefreshCw size={11} />
-                </button>
-              </>
-            )}
-            {collapsed && <span className="sb-tooltip">System Online</span>}
-          </div>
+
         </div>
       </aside>
     </>

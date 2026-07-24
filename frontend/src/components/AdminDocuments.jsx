@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import { ToastContainer, useToast } from './Toast';
 import Select from './ui/Select';
 import {
@@ -268,6 +269,184 @@ const timeAgo = (date) => {
   return Math.floor(seconds) + " seconds ago";
 };
 
+// ── Palette for avatar initials backgrounds ──────────────────────────────────
+const AVATAR_PALETTES = [
+  { bg: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff' },
+  { bg: 'linear-gradient(135deg,#0ea5e9,#06b6d4)', color: '#fff' },
+  { bg: 'linear-gradient(135deg,#f59e0b,#f97316)', color: '#fff' },
+  { bg: 'linear-gradient(135deg,#10b981,#059669)', color: '#fff' },
+  { bg: 'linear-gradient(135deg,#ec4899,#f43f5e)', color: '#fff' },
+  { bg: 'linear-gradient(135deg,#8b5cf6,#a855f7)', color: '#fff' },
+];
+const paletteFor = (name = '') =>
+  AVATAR_PALETTES[name.charCodeAt(0) % AVATAR_PALETTES.length];
+
+// ── Enhanced Avatar Stack ────────────────────────────────────────────────────
+const AvatarStack = ({ people = [], max = 3 }) => {
+  const visible = people.slice(0, max);
+  const extra   = people.length - max;
+  return (
+    <div className="ajc-avatars-enhanced">
+      {visible.map((p, idx) => {
+        const initials = (p.name || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const pal = paletteFor(p.name || '');
+        return (
+          <div key={p._id || idx} className="ajc-avatar-wrap" style={{ zIndex: max - idx }} title={p.name}>
+            {p.profilePicture ? (
+              <img src={p.profilePicture} alt={p.name} className="ajc-avatar-img" />
+            ) : (
+              <div className="ajc-avatar-initials" style={{ background: pal.bg, color: pal.color }}>
+                {initials}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {extra > 0 && (
+        <div className="ajc-avatar-wrap ajc-avatar-extra" style={{ zIndex: 0 }} title={`+${extra} more`}>
+          +{extra}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Reusable Document Card ───────────────────────────────────────────────────
+const DocCard = ({
+  doc, currentUser,
+  variant = 'all',        // 'all' | 'submission' | 'approval'
+  onView, onTimeline, onDelete,
+}) => {
+  const approved  = doc.status === 'Approved';
+  const rejected  = doc.status === 'Rejected';
+  const canDelete = variant === 'submission' &&
+                    doc.sender?._id === currentUser?._id && !approved;
+
+  const progressPct = doc.approvers?.length
+    ? (doc.approvalsReceived?.length / doc.approvers.length) * 100
+    : 100;
+
+  const statusCls = approved ? 'ajc-tag-success' : rejected ? 'ajc-tag-danger' : 'ajc-tag-warning';
+
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/documents/${doc._id}/download`, {
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `${doc.title.replace(/[^a-z0-9_\-\.]/gi, '_')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download error:', err);
+    }
+  };
+
+  // Who to show in the avatar stack
+  const avatarPeople = doc.approvers?.length ? doc.approvers : (doc.sender ? [doc.sender] : []);
+
+  return (
+    <div className="adm-job-card">
+      {/* ── Header ── */}
+      <div className="ajc-header">
+        <AvatarStack people={avatarPeople} max={3} />
+        {variant === 'all' && (
+          <span className="ajc-tag ajc-tag-success" style={{ fontSize: '0.65rem', letterSpacing: '0.03em' }}>✓ Approved</span>
+        )}
+        {variant === 'submission' && (
+          <span className={`ajc-tag ${statusCls}`} style={{ fontSize: '0.65rem' }}>{doc.status}</span>
+        )}
+        {variant === 'approval' && (
+          <span className="ajc-tag ajc-tag-warning ajc-pulse-badge" style={{ fontSize: '0.65rem' }}>Needs Review</span>
+        )}
+      </div>
+
+      {/* ── Body ── */}
+      <div className="ajc-body">
+        <div className="ajc-meta">
+          <span className="ajc-sender">{doc.sender?.name || 'Unknown'}</span>
+          <span className="ajc-dot">·</span>
+          <span className="ajc-time">{timeAgo(doc.createdAt)}</span>
+        </div>
+        <h3 className="ajc-title">{doc.title}</h3>
+        <div className="ajc-tags">
+          <span className="ajc-tag ajc-tag-type">{doc.documentType}</span>
+          {doc.isPublic && (
+            <span className="ajc-tag ajc-tag-type">
+              <Globe size={9} style={{ marginRight: 3 }} />Public
+            </span>
+          )}
+        </div>
+        {doc.dueDate && (
+          <div className="ajc-due-date">
+            <CalendarClock size={11} />
+            Due {new Date(doc.dueDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Footer ── */}
+      <div className="ajc-footer">
+        {variant !== 'all' && (
+          <div className="ajc-progress-wrap">
+            <div className="ajc-progress-bar">
+              <div
+                className={`ajc-progress-fill ${approved ? 'fill-success' : rejected ? 'fill-danger' : ''}`}
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="ajc-progress-label">
+              {doc.approvers?.length
+                ? `${doc.approvalsReceived?.length || 0}/${doc.approvers.length} approved`
+                : 'Auto-approved'}
+            </span>
+          </div>
+        )}
+
+        <div className="ajc-actions">
+          <button className="ajc-btn ajc-btn-ghost" onClick={() => onTimeline(doc)} title="Timeline">
+            <Clock size={13} /> Timeline
+          </button>
+
+          {/* Download */}
+          <button
+            className="ajc-btn ajc-btn-download"
+            onClick={handleDownload}
+            title="Download PDF"
+          >
+            <Download size={13} />
+          </button>
+
+          <button
+            className="ajc-btn ajc-btn-primary"
+            onClick={() => onView(doc)}
+            title={variant === 'approval' ? 'Review' : 'View'}
+          >
+            <Eye size={13} /> {variant === 'approval' ? 'Review' : 'View'}
+          </button>
+
+          {canDelete && (
+            <button
+              className="ajc-btn ajc-btn-danger"
+              onClick={() => onDelete(doc._id)}
+              title="Delete Document"
+              style={{ padding: '6px 8px' }}
+            >
+              <Trash2 size={13} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [publicDocuments, setPublicDocuments] = useState([]);
@@ -530,48 +709,16 @@ const AdminDocuments = () => {
         {activeTab === 'all' && (
           <div className="adm-section">
             {allDocs.length === 0 ? (
-              <div className="adm-empty">
-                <FileText size={32} />
-                <p>No approved documents are available yet.</p>
-              </div>
+              <EmptyState
+                variant="documents"
+                title="No approved documents yet"
+                subtitle="Approved and publicly available documents will appear here."
+              />
             ) : (
               <div className="adm-grid">
                 {allDocs.map(doc => (
-                  <div className="adm-job-card" key={doc._id}>
-                    <div className="ajc-header">
-                      <div className="ajc-avatars">
-                        {doc.approvers && doc.approvers.slice(0, 3).map((approver, idx) => (
-                          <img key={approver._id}
-                            src={approver.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(approver.name)}&background=random`}
-                            alt={approver.name} className="ajc-avatar"
-                            style={{ zIndex: 10 - idx }} title={approver.name} />
-                        ))}
-                      </div>
-                      <span className="ajc-tag ajc-tag-success" style={{ fontSize: '0.68rem' }}>Approved</span>
-                    </div>
-                    <div className="ajc-body">
-                      <div className="ajc-meta">
-                        <span className="ajc-sender">{doc.sender?.name || 'Unknown'}</span>
-                        <span className="ajc-dot">·</span>
-                        <span className="ajc-time">{timeAgo(doc.createdAt)}</span>
-                      </div>
-                      <h3 className="ajc-title">{doc.title}</h3>
-                      <div className="ajc-tags">
-                        <span className="ajc-tag ajc-tag-type">{doc.documentType}</span>
-                        {doc.isPublic && <span className="ajc-tag ajc-tag-type"><Globe size={9} style={{ marginRight: 3 }} />Public</span>}
-                      </div>
-                    </div>
-                    <div className="ajc-footer">
-                      <div className="ajc-actions">
-                        <button className="ajc-btn ajc-btn-ghost" onClick={() => setTimelineDoc(doc)}>
-                          <Clock size={13} /> Timeline
-                        </button>
-                        <button className="ajc-btn ajc-btn-primary" onClick={() => setReviewDoc(doc)}>
-                          <Eye size={13} /> View
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <DocCard key={doc._id} doc={doc} currentUser={currentUser} variant="all"
+                    onView={setReviewDoc} onTimeline={setTimelineDoc} onDelete={handleDeleteDocument} />
                 ))}
               </div>
             )}
@@ -582,80 +729,17 @@ const AdminDocuments = () => {
         {activeTab === 'submissions' && (
           <div className="adm-section">
             {mySubmissions.length === 0 ? (
-              <div className="adm-empty">
-                <FileText size={32} />
-                <p>You haven't uploaded any documents yet.</p>
-              </div>
+              <EmptyState
+                variant="documents-mine"
+                title="You haven't uploaded anything yet"
+                subtitle="Upload your first document using the button above."
+              />
             ) : (
               <div className="adm-grid">
-                {mySubmissions.map(doc => {
-                  const approved = doc.status === 'Approved';
-                  const rejected = doc.status === 'Rejected';
-                  const progressPct = doc.approvers?.length ? (doc.approvalsReceived?.length / doc.approvers.length) * 100 : 100;
-                  const canDelete = doc.sender?._id === currentUser?._id && !approved;
-                  return (
-                    <div className="adm-job-card" key={doc._id}>
-                      <div className="ajc-header">
-                        <div className="ajc-avatars">
-                          {doc.approvers && doc.approvers.slice(0, 3).map((approver, idx) => (
-                            <img key={approver._id}
-                              src={approver.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(approver.name)}&background=random`}
-                              alt={approver.name} className="ajc-avatar"
-                              style={{ zIndex: 10 - idx }} title={approver.name} />
-                          ))}
-                          {doc.approvers && doc.approvers.length > 3 && (
-                            <div className="ajc-avatar ajc-avatar-more" style={{ zIndex: 1 }}>+{doc.approvers.length - 3}</div>
-                          )}
-                        </div>
-                        <button className="ajc-save-btn"><Bookmark size={13} /> Save</button>
-                      </div>
-                      <div className="ajc-body">
-                        <div className="ajc-meta">
-                          <span className="ajc-sender">{doc.sender?.name || 'Me'}</span>
-                          <span className="ajc-dot">·</span>
-                          <span className="ajc-time">{timeAgo(doc.createdAt)}</span>
-                        </div>
-                        <h3 className="ajc-title">{doc.title}</h3>
-                        <div className="ajc-tags">
-                          <span className="ajc-tag ajc-tag-type">{doc.documentType}</span>
-                          <span className={`ajc-tag ${approved ? 'ajc-tag-success' : rejected ? 'ajc-tag-danger' : 'ajc-tag-warning'}`}>
-                            {doc.status}
-                          </span>
-                        </div>
-                        {doc.dueDate && (
-                          <div className="ajc-due-date">
-                            <CalendarClock size={11} />
-                            Due {new Date(doc.dueDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="ajc-footer">
-                        <div className="ajc-progress-wrap">
-                          <div className="ajc-progress-bar">
-                            <div className={`ajc-progress-fill ${approved ? 'fill-success' : rejected ? 'fill-danger' : ''}`} style={{ width: `${progressPct}%` }} />
-                          </div>
-                          <span className="ajc-progress-label">
-                            {doc.approvers?.length ? `${doc.approvalsReceived?.length || 0}/${doc.approvers.length} approved` : 'Auto-approved'}
-                          </span>
-                        </div>
-                        <div className="ajc-actions">
-                          <button className="ajc-btn ajc-btn-ghost" onClick={() => setTimelineDoc(doc)}>
-                            <Clock size={13} /> Timeline
-                          </button>
-                          <button className="ajc-btn ajc-btn-primary" onClick={() => setReviewDoc(doc)}>
-                            <Eye size={13} /> View
-                          </button>
-                          {canDelete && (
-                            <button className="ajc-btn ajc-btn-danger" onClick={() => handleDeleteDocument(doc._id)}
-                              title="Delete Document" style={{ padding: '6px 8px' }}>
-                              <Trash2 size={13} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {mySubmissions.map(doc => (
+                  <DocCard key={doc._id} doc={doc} currentUser={currentUser} variant="submission"
+                    onView={setReviewDoc} onTimeline={setTimelineDoc} onDelete={handleDeleteDocument} />
+                ))}
               </div>
             )}
           </div>
@@ -665,57 +749,16 @@ const AdminDocuments = () => {
         {activeTab === 'approvals' && (
           <div className="adm-section">
             {pendingApprovals.length === 0 ? (
-              <div className="adm-empty">
-                <CheckCircle size={32} />
-                <p>No documents are waiting for your approval.</p>
-              </div>
+              <EmptyState
+                variant="documents-approvals"
+                title="No pending approvals"
+                subtitle="All documents have been reviewed — nothing left to approve."
+              />
             ) : (
               <div className="adm-grid">
                 {pendingApprovals.map(doc => (
-                  <div className="adm-job-card" key={doc._id}>
-                    <div className="ajc-header">
-                      <div className="ajc-avatars">
-                        {doc.approvers && doc.approvers.slice(0, 3).map((approver, idx) => (
-                          <img key={approver._id}
-                            src={approver.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(approver.name)}&background=random`}
-                            alt={approver.name} className="ajc-avatar"
-                            style={{ zIndex: 10 - idx }} title={approver.name} />
-                        ))}
-                        {doc.approvers && doc.approvers.length > 3 && (
-                          <div className="ajc-avatar ajc-avatar-more" style={{ zIndex: 1 }}>+{doc.approvers.length - 3}</div>
-                        )}
-                      </div>
-                      <span className="ajc-tag ajc-tag-warning" style={{ fontSize: '0.68rem' }}>Needs Review</span>
-                    </div>
-                    <div className="ajc-body">
-                      <div className="ajc-meta">
-                        <span className="ajc-sender">{doc.sender?.name || 'Unknown'}</span>
-                        <span className="ajc-dot">·</span>
-                        <span className="ajc-time">{timeAgo(doc.createdAt)}</span>
-                      </div>
-                      <h3 className="ajc-title">{doc.title}</h3>
-                      <div className="ajc-tags">
-                        <span className="ajc-tag ajc-tag-type">{doc.documentType}</span>
-                        <span className="ajc-tag ajc-tag-warning">Pending Review</span>
-                      </div>
-                    </div>
-                    <div className="ajc-footer">
-                      <div className="ajc-progress-wrap">
-                        <div className="ajc-progress-bar">
-                          <div className="ajc-progress-fill" style={{ width: `${doc.approvers?.length ? (doc.approvalsReceived?.length / doc.approvers.length) * 100 : 0}%` }} />
-                        </div>
-                        <span className="ajc-progress-label">{doc.approvalsReceived?.length || 0}/{doc.approvers?.length || 0} approved</span>
-                      </div>
-                      <div className="ajc-actions">
-                        <button className="ajc-btn ajc-btn-ghost" onClick={() => setTimelineDoc(doc)}>
-                          <Clock size={13} /> Timeline
-                        </button>
-                        <button className="ajc-btn ajc-btn-primary" onClick={() => setReviewDoc(doc)}>
-                          <Eye size={13} /> Review
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <DocCard key={doc._id} doc={doc} currentUser={currentUser} variant="approval"
+                    onView={setReviewDoc} onTimeline={setTimelineDoc} onDelete={handleDeleteDocument} />
                 ))}
               </div>
             )}
@@ -723,6 +766,7 @@ const AdminDocuments = () => {
         )}
 
       </div>
+
 
 
 
@@ -739,6 +783,7 @@ const AdminDocuments = () => {
 
             <form onSubmit={handleUpload}>
               <div className="adm-modal-body adm-upload-body">
+
 
                 {/* Title */}
                 <div className="form-group">

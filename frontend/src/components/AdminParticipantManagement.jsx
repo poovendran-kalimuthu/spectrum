@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import { QRCodeCanvas } from 'qrcode.react';
 import AttendanceScanner from './AttendanceScanner';
 import jsPDF from 'jspdf';
@@ -726,7 +727,11 @@ const AdminParticipantManagement = () => {
       {/* ── Table ── */}
       <div className="ae-list-results animate-fade-in">
         {filteredRegistrations.length === 0 ? (
-          <div className="ae-empty"><span>📭</span><p>No teams in this category.</p></div>
+          <EmptyState
+            variant="participants"
+            title="No teams in this category"
+            subtitle={search ? 'Try a different search term.' : 'Teams will appear here once they match the selected filter.'}
+          />
         ) : (
           <div className="ae-table-wrapper card glass hide-on-mobile">
             <table className="ae-table printable">

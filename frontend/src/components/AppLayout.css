@@ -13,7 +13,7 @@
   flex: 1;
   min-width: 0;
   margin-left: var(--sb-width, 260px);
-  transition: margin-left 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: margin-left 0.35s cubic-bezier(0.2, 0, 0, 1);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;

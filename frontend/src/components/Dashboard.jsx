@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import { API_URL } from '../config';
 import AttendanceScanner from './AttendanceScanner';
 import MentorDashboard from './MentorDashboard';
@@ -109,11 +110,11 @@ const Dashboard = () => {
               <Loader text="Fetching events..." />
             </div>
           ) : events.length === 0 ? (
-            <div className="db-empty-state">
-              <span style={{ fontSize: '2.5rem' }}>🎭</span>
-              <h3>No events available yet</h3>
-              <p>Check back soon for upcoming HELIX'26 highlights!</p>
-            </div>
+            <EmptyState
+              variant="events"
+              title="No events available yet"
+              subtitle="Check back soon for upcoming HELIX'26 highlights!"
+            />
           ) : (
             <div className="db-event-grid">
               {events.map((ev, i) => (

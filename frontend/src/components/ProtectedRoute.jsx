@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import Toast from './Toast';
 
 const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
@@ -35,14 +36,14 @@ const ProtectedRoute = ({ children }) => {
   }, [location]);
 
   if (loading) {
-    return <Loader fullScreen text="Verifying authentication..." />;
+    return <Loader fullScreen text="Loading..." />;
   }
 
   if (!authenticated) {
     // Show a quick alert before navigating (optional, but requested by user)
     // In a real app, a toast would be better. For now, we'll just redirect.
     // The user specifically asked to "show you are not logged in"
-    alert("You are not logged in. Redirecting to login page...");
+    Toast("You are not logged in. Redirecting to login page...");
     return <Navigate to="/login" replace />;
   }
 

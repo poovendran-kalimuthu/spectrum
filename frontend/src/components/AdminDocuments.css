@@ -65,7 +65,7 @@
   border-color: #c7d2de;
 }
 
-/* ── Header: avatars + save ── */
+/* ── Header: avatars + badge ── */
 .ajc-header {
   display: flex;
   justify-content: space-between;
@@ -73,44 +73,96 @@
   margin-bottom: 0.9rem;
 }
 
-.ajc-avatars {
+/* ── Enhanced Avatar Stack ── */
+
+.ajc-avatars-enhanced {
   display: flex;
   align-items: center;
-  padding-right: 10px;
 }
 
-.ajc-avatar {
-  width: 36px;
-  height: 36px;
+.ajc-avatar-wrap {
+  position: relative;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  margin-right: -9px;
-  object-fit: cover;
-  background: #e2e8f0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  transition: transform 0.2s ease;
+  margin-right: -10px;
   flex-shrink: 0;
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.18));
 }
 
-.ajc-avatar:hover {
-  transform: translateY(-3px) scale(1.12);
+.ajc-avatar-wrap:hover {
+  transform: translateY(-4px) scale(1.15);
   z-index: 20 !important;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
 }
 
-.ajc-avatar:last-child {
+.ajc-avatar-wrap:last-child {
   margin-right: 0;
 }
 
-.ajc-avatar-more {
+.ajc-avatar-img,
+.ajc-avatar-initials {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2.5px solid var(--clr-surface, #fff);
+  object-fit: cover;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.ajc-avatar-extra {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid var(--clr-surface, #fff);
 }
+
+/* Pulse badge for pending items */
+.ajc-pulse-badge {
+  position: relative;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+/* Download button */
+.ajc-btn-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: var(--clr-surface-2, #f1f5f9);
+  color: var(--clr-text-muted, #64748b);
+  border: 1px solid var(--clr-border, #e2e8f0);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  font-size: 0.75rem;
+  font-weight: 500;
+  gap: 4px;
+}
+.ajc-btn-download:hover {
+  background: #dbeafe;
+  color: #2563eb;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
 
 .ajc-save-btn {
   display: flex;

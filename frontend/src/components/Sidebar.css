@@ -12,7 +12,7 @@
   --sb-text-active: #ffffff;
   --sb-item-hover: rgba(255, 255, 255, 0.05);
   --sb-item-active: rgba(255, 255, 255, 0.1);
-  --sb-transition: var(--transition-slow);
+  --sb-transition: 0.5s cubic-bezier(0.25, 0, 0, 1);
 }
 
 /* ══ Sidebar Shell ══ */
@@ -48,7 +48,6 @@
   border-right-color: rgba(255, 255, 255, 0.1);
 }
 
-/* ══ Logo Row ══ */
 .sb-logo-row {
   display: flex;
   align-items: center;
@@ -106,12 +105,11 @@
 .sp-collapsed .sb-section-label,
 .sp-collapsed .sb-chevron,
 .sp-collapsed .sb-badge,
-.sp-collapsed .sb-sub-nav {
+.sp-collapsed .sb-sub-nav,
+.sp-collapsed .sb-user-info,
+.sp-collapsed .sb-logout-btn {
   opacity: 0;
   visibility: hidden;
-  width: 0;
-  margin: 0;
-  padding: 0;
   pointer-events: none;
 }
 
@@ -150,7 +148,22 @@
   padding-bottom: 0.5rem;
 }
 
-.sb-nav::-webkit-scrollbar { width: 0; }
+.sb-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sp-collapsed .sb-nav::-webkit-scrollbar {
+  width: 0;
+}
+.sb-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sb-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.sb-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 .sb-group {
   display: flex;
@@ -248,7 +261,11 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  transition: transform var(--transition-base);
+  transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sb-item-wrap:hover .sb-chevron {
+  transform: rotate(90deg);
 }
 
 .sb-badge {
@@ -310,19 +327,30 @@
   display: none !important;
 }
 
+.sb-sub-list-container {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sp-collapsed .sb-item-wrap:hover .sb-sub-list-container {
+  grid-template-rows: 0fr; /* Don't expand inline when collapsed, use tooltip instead */
+}
+
+/* We don't want to expand inline if we're not hovered (since it expands on hover now) */
+.sb-item-wrap:hover .sb-sub-list-container {
+  grid-template-rows: 1fr;
+}
+
 .sb-sub-list {
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 1px;
   margin: 2px 0 2px 0.625rem;
   padding-left: 1.5rem;
   border-left: 1px solid rgba(255,255,255,0.07);
-  animation: sbSubReveal 0.18s ease;
-}
-
-@keyframes sbSubReveal {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 
 .sb-sub-item {
@@ -340,13 +368,14 @@
   font-family: inherit;
   text-align: left;
   width: 100%;
-  transition: all 0.14s ease;
+  transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
   white-space: nowrap;
 }
 
 .sb-sub-item:hover {
   background: var(--sb-item-hover);
   color: #e4e4e7;
+  padding-left: 0.75rem;
 }
 
 .sb-sub-item.active {

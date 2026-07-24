@@ -98,11 +98,11 @@ router.get('/dev-login', async (req, res) => {
           name: 'Developer Admin',
           email: 'admin@test.com',
           profilePicture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
-          role: 'admin',
+          role: 'superadmin',
           isProfileComplete: true
         });
-      } else if (user.role !== 'admin') {
-        user.role = 'admin';
+      } else if (user.role !== 'superadmin') {
+        user.role = 'superadmin';
         await user.save();
       }
 
@@ -111,7 +111,7 @@ router.get('/dev-login', async (req, res) => {
           return res.status(500).json({ error: 'Dev login session creation failed', details: err });
         }
         req.session.save(() => {
-          res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/events`);
+          res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/dashboard`);
         });
       });
     } catch (error) {

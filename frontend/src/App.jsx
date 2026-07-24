@@ -4,6 +4,7 @@ import axios from 'axios';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import CompleteProfile from './components/CompleteProfile';
+import CreateMentorProfile from './components/CreateMentorProfile';
 import EditProfile from './components/EditProfile';
 import EventsList from './components/EventsList';
 import EventDetails from './components/EventDetails';
@@ -24,6 +25,7 @@ import AdminAuditLogs from './components/AdminAuditLogs';
 import AdminDocuments from './components/AdminDocuments';
 import AdminOverview from './components/AdminOverview';
 import AdminTeam from './components/AdminTeam';
+import AdminFinance from './components/AdminFinance';
 import ProtectedRoute from './components/ProtectedRoute';
 import WinnersBoard from './components/WinnersBoard';
 import AppLayout from './components/AppLayout';
@@ -77,6 +79,7 @@ function App() {
 
         {/* Complete Profile — protected but no sidebar yet */}
         <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfile /></ProtectedRoute>} />
+        <Route path="/mentor-setup" element={<ProtectedRoute><CreateMentorProfile /></ProtectedRoute>} />
 
         {/* Protected + Sidebar Routes */}
         <Route path="/dashboard"              element={<Protected><Dashboard /></Protected>} />
@@ -104,6 +107,7 @@ function App() {
         <Route path="/admin/users"                     element={<Protected><AdminUsers /></Protected>} />
         <Route path="/admin/audit"                     element={<Protected><AdminAuditLogs /></Protected>} />
         <Route path="/admin/documents"                 element={<Protected><AdminDocuments /></Protected>} />
+        <Route path="/admin/finance"                   element={<Protected><AdminFinance /></Protected>} />
 
         {/* Root → Login */}
         <Route path="/" element={<Navigate to="/login" replace />} />

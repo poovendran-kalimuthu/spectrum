@@ -27,6 +27,7 @@ import venueRoutes from './routes/venues.js';
 import searchRoutes from './routes/search.js';
 import notificationRoutes from './routes/notifications.js';
 import documentRoutes from './routes/documentRoutes.js';
+import financeRoutes from './routes/finance.js';
 import { protect } from './middleware/authMiddleware.js';
 
 const app = express();
@@ -103,6 +104,7 @@ app.use('/api/venues', venueRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/finance', financeRoutes);
 
 // Example protected route
 app.get('/api/dashboard', protect, (req, res) => {

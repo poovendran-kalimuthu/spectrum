@@ -277,8 +277,10 @@ const checkAndFixGrammar = (text) => {
 };
 
 // --- Custom Calendar DatePicker ---
-const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
+const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name = 'date' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [rawInput, setRawInput] = useState('');
+  const [inputError, setInputError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (value) {
       const parts = value.split('-');
@@ -309,6 +311,44 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     return d.toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  // Sync display when value changes externally
+  useEffect(() => { setRawInput(value ? formatDateDisplay(value) : ''); }, [value]);
+
+  const parseTyped = (s) => {
+    if (!s || !s.trim()) return null;
+    let m;
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) { const d = new Date(+m[1],+m[2]-1,+m[3]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    return null;
+  };
+
+  const handleTextChange = (e) => {
+    const val = e.target.value;
+    setRawInput(val);
+    setInputError('');
+    if (!val.trim()) { onChange({ target: { name, value: '' } }); return; }
+    const parsed = parseTyped(val);
+    if (parsed) {
+      const y = parsed.getFullYear(), mo = String(parsed.getMonth()+1).padStart(2,'0'), dd = String(parsed.getDate()).padStart(2,'0');
+      onChange({ target: { name, value: `${y}-${mo}-${dd}` } });
+      setCurrentMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
+    }
+  };
+
+  const handleTextBlur = () => {
+    if (!rawInput.trim()) { setInputError(''); return; }
+    if (!parseTyped(rawInput)) {
+      setInputError('Invalid date — use DD/MM/YYYY or YYYY-MM-DD');
+    } else {
+      setInputError('');
+      setRawInput(formatDateDisplay(value));
+    }
+  };
+
   const selectedDate = value ? new Date(value + 'T00:00:00') : null;
 
   const handlePrevMonth = () => {
@@ -324,8 +364,9 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     const month = String(currentMonth.getMonth() + 1).padStart(2, '0');
     const dayStr = String(day).padStart(2, '0');
     const formatted = `${year}-${month}-${dayStr}`;
-    onChange({ target: { name: 'date', value: formatted } });
+    onChange({ target: { name, value: formatted } });
     setIsOpen(false);
+    setInputError('');
   };
 
   const year = currentMonth.getFullYear();
@@ -350,23 +391,27 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     <div className="custom-datepicker" ref={containerRef}>
       <div
         className="datepicker-input-wrapper"
-        onClick={() => setIsOpen(!isOpen)}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
       >
         <input
           type="text"
-          readOnly
-          required
           placeholder={placeholder}
-          value={formatDateDisplay(value)}
+          value={rawInput}
+          onChange={handleTextChange}
+          onBlur={handleTextBlur}
+          onFocus={() => setIsOpen(true)}
           className="form-input datepicker-display-input"
-          style={{ width: '100%', cursor: 'pointer', paddingRight: '40px' }}
+          style={{ width: '100%', paddingRight: '40px', borderColor: inputError ? '#ef4444' : undefined, boxShadow: inputError ? '0 0 0 3px rgba(239,68,68,0.12)' : undefined }}
         />
         <CalendarIcon
           size={16}
-          style={{ position: 'absolute', right: '14px', color: 'var(--clr-text-muted)', pointerEvents: 'none' }}
+          onClick={() => setIsOpen(v => !v)}
+          style={{ position: 'absolute', right: '14px', color: inputError ? '#ef4444' : 'var(--clr-text-muted)', cursor: 'pointer' }}
         />
       </div>
+      {inputError && (
+        <small style={{ color: '#ef4444', fontSize: '0.71rem', marginTop: '3px', display: 'block' }}>{inputError}</small>
+      )}
 
       {isOpen && (
         <div className="datepicker-popover glass-strong">
@@ -1084,6 +1129,7 @@ const AdminEvents = () => {
                           <option value="Technical">Technical</option>
                           <option value="Workshop">Workshop</option>
                           <option value="Non-Technical">Non-Technical</option>
+                          <option value="Guest Lecture">Guest Lecture</option>
                         </Select>
                       </div>
 
@@ -1162,7 +1208,7 @@ const AdminEvents = () => {
 
                   <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <label className="form-label" style={{ margin: 0, fontWeight: '600', color: '#334155' }}>Event Description</label>
+                      <label className="form-label" style={{ margin: 0, fontWeight: '600', color: '#334155' }}>Event Description <span style={{ color: '#ef4444' }}>*</span></label>
                       {checkingGrammar && (
                         <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: '600' }}>
                           <span className="ae-checking-dot" style={{ width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block' }} />

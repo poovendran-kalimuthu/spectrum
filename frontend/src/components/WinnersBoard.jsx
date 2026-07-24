@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import './WinnersBoard.css';
 
 const WinnersBoard = () => {
@@ -50,11 +51,11 @@ const WinnersBoard = () => {
         </header>
 
         {winners.length === 0 ? (
-          <div className="wb-empty">
-            <span className="wb-empty-icon">🏆</span>
-            <h3>Results are not published yet</h3>
-            <p>Check back later to see the winners for this event.</p>
-          </div>
+          <EmptyState
+            variant="results"
+            title="Results not published yet"
+            subtitle="Check back after evaluation to see the winners for this event."
+          />
         ) : (
           <div className="wb-grid">
             {winners.map((winner, idx) => (

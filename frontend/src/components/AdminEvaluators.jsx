@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import './AdminEvents.css';
 
 const AdminEvaluators = () => {
@@ -177,10 +178,11 @@ const AdminEvaluators = () => {
       )}
 
       {evaluators.length === 0 && !loading && !formOpen && (
-        <div className="ae-empty">
-          <span>🧑‍⚖️</span>
-          <p>No external evaluators assigned to this event yet.</p>
-        </div>
+        <EmptyState
+          variant="evaluators"
+          title="No evaluators assigned"
+          subtitle="Add jury evaluators using the button above to get started."
+        />
       )}
 
       {evaluators.length > 0 && (

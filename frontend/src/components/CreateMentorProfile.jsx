@@ -1,38 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from './Loader';
 import { API_URL } from '../config';
-import './CompleteProfile.css';
+import './CompleteProfile.css'; // We can reuse the styling
 import Select from './ui/Select';
 
 const DEPARTMENTS = ['CSE', 'ECE', 'EEE', 'MECH', 'IT', 'CIVIL', 'ACT', 'VLSI', 'AIML', 'AIDS', 'CYBER', 'AUTO'];
-const YEARS = ['Second', 'Third'];
 
-const REQUIRED_FIELDS = ['name', 'registerNumber', 'department', 'year', 'section', 'mobile'];
+const REQUIRED_FIELDS = ['name', 'registerNumber', 'department', 'mobile'];
 
-const CompleteProfile = () => {
+const CreateMentorProfile = () => {
   const [formData, setFormData] = useState({
-    name: '', registerNumber: '', department: 'CSE', year: 'Second',
-    section: '', mobile: '', alternateEmail: '',
-    subRole: 'student', assignedMentor: ''
+    name: '', registerNumber: '', department: 'CSE',
+    mobile: '', alternateEmail: '',
+    subRole: 'mentor'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [touched, setTouched] = useState({});
-  const [availableMentors, setAvailableMentors] = useState([]);
   const navigate = useNavigate();
-
-  // Fetch approved mentors for student assignment
-  useEffect(() => {
-    const fetchMentors = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/admin/mentors`, { withCredentials: true });
-        if (res.data.success) setAvailableMentors(res.data.mentors);
-      } catch { /* non-critical */ }
-    };
-    fetchMentors();
-  }, []);
 
   const handleChange = e => {
     setFormData(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -53,15 +40,19 @@ const CompleteProfile = () => {
       if (!formData.mobile) return 'Mobile number is required';
       if (!/^\d{10}$/.test(formData.mobile)) return 'Enter a valid 10-digit number';
     }
-    if (name === 'registerNumber' && !formData.registerNumber) return 'Register number is required';
+    if (name === 'registerNumber' && !formData.registerNumber) return 'ID is required';
     if (name === 'name' && !formData.name) return 'Full name is required';
-    if (name === 'section' && !formData.section) return 'Section is required';
     return null;
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
     setTouched(Object.fromEntries(REQUIRED_FIELDS.map(f => [f, true])));
+
+    if (REQUIRED_FIELDS.some(f => !formData[f])) {
+      setError('Please fill all required fields.');
+      return;
+    }
 
     if (!/^\d{10}$/.test(formData.mobile)) {
       setError('Please enter a valid 10-digit mobile number.');
@@ -70,8 +61,16 @@ const CompleteProfile = () => {
 
     setLoading(true); setError('');
     try {
-      const res = await axios.put(`${API_URL}/api/auth/profile`, formData, { withCredentials: true });
-      if (res.data.success) navigate('/dashboard');
+      const payload = {
+        ...formData,
+        subRole: 'mentor',
+        mentorStatus: 'pending'
+      };
+      
+      const res = await axios.put(`${API_URL}/api/auth/profile`, payload, { withCredentials: true });
+      if (res.data.success) {
+        navigate('/dashboard');
+      }
     } catch {
       setError('Failed to update profile. Please try again.');
     } finally {
@@ -81,7 +80,7 @@ const CompleteProfile = () => {
 
   return (
     <div className="cp-wrapper">
-      {loading && <Loader fullScreen text="Saving Profile..." />}
+      {loading && <Loader fullScreen text="Submitting Request..." />}
 
       {/* Background decorations */}
       <div className="cp-bg-decoration">
@@ -94,10 +93,10 @@ const CompleteProfile = () => {
         {/* Header */}
         <div className="cp-header">
           <div className="cp-icon-wrap">
-            <span className="cp-icon-emoji">🎓</span>
+            <span className="cp-icon-emoji">🧑‍🏫</span>
           </div>
-          <h1>Complete Your Profile</h1>
-          <p>Fill in your details to access all Spectrum features</p>
+          <h1>Apply as Mentor</h1>
+          <p>Complete your profile to join as a Spectrum Mentor</p>
         </div>
 
         {/* Progress */}
@@ -128,58 +127,39 @@ const CompleteProfile = () => {
             <input
               className="cp-input" type="text" name="name" required
               value={formData.name} onChange={handleChange} onBlur={handleBlur}
-              placeholder="e.g. Arun Kumar" autoComplete="name"
+              placeholder="e.g. Dr. Arun Kumar" autoComplete="name"
             />
             {getFieldError('name') && <span className="cp-field-error">{getFieldError('name')}</span>}
           </div>
 
-          {/* Register Number */}
+          {/* Register Number / Employee ID */}
           <div className={`cp-field ${touched.registerNumber && !formData.registerNumber ? 'has-error' : formData.registerNumber ? 'has-value' : ''}`}>
-            <label className="cp-label">Register / Roll Number <span className="cp-required">*</span></label>
+            <label className="cp-label">Employee ID / Register No <span className="cp-required">*</span></label>
             <input
               className="cp-input" type="text" name="registerNumber" required
               value={formData.registerNumber} onChange={handleChange} onBlur={handleBlur}
-              placeholder="e.g. 727624BEC001"
+              placeholder="e.g. EMP12345"
             />
             {getFieldError('registerNumber') && <span className="cp-field-error">{getFieldError('registerNumber')}</span>}
           </div>
 
-          {/* Department + Year */}
-          <div className="cp-row">
-            <div className="cp-field has-value">
-              <label className="cp-label">Department <span className="cp-required">*</span></label>
-              <Select className="cp-input cp-select" name="department" value={formData.department} onChange={handleChange} required>
-                {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
-              </Select>
-            </div>
-            <div className="cp-field has-value">
-              <label className="cp-label">Year <span className="cp-required">*</span></label>
-              <Select className="cp-input cp-select" name="year" value={formData.year} onChange={handleChange} required>
-                {YEARS.map(y => <option key={y} value={y}>{y} Year</option>)}
-              </Select>
-            </div>
+          {/* Department */}
+          <div className="cp-field has-value">
+            <label className="cp-label">Department <span className="cp-required">*</span></label>
+            <Select className="cp-input cp-select" name="department" value={formData.department} onChange={handleChange} required>
+              {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+            </Select>
           </div>
 
-          {/* Section + Mobile */}
-          <div className="cp-row">
-            <div className={`cp-field ${touched.section && !formData.section ? 'has-error' : formData.section ? 'has-value' : ''}`}>
-              <label className="cp-label">Section <span className="cp-required">*</span></label>
-              <input
-                className="cp-input" type="text" name="section" required
-                value={formData.section} onChange={handleChange} onBlur={handleBlur}
-                placeholder="e.g. A" maxLength={3}
-              />
-              {getFieldError('section') && <span className="cp-field-error">{getFieldError('section')}</span>}
-            </div>
-            <div className={`cp-field ${touched.mobile && getFieldError('mobile') ? 'has-error' : formData.mobile && /^\d{10}$/.test(formData.mobile) ? 'has-value' : ''}`}>
-              <label className="cp-label">Mobile <span className="cp-required">*</span></label>
-              <input
-                className="cp-input" type="tel" name="mobile" required
-                value={formData.mobile} onChange={handleChange} onBlur={handleBlur}
-                placeholder="10-digit number" maxLength={10}
-              />
-              {getFieldError('mobile') && <span className="cp-field-error">{getFieldError('mobile')}</span>}
-            </div>
+          {/* Mobile */}
+          <div className={`cp-field ${touched.mobile && getFieldError('mobile') ? 'has-error' : formData.mobile && /^\d{10}$/.test(formData.mobile) ? 'has-value' : ''}`}>
+            <label className="cp-label">Mobile <span className="cp-required">*</span></label>
+            <input
+              className="cp-input" type="tel" name="mobile" required
+              value={formData.mobile} onChange={handleChange} onBlur={handleBlur}
+              placeholder="10-digit number" maxLength={10}
+            />
+            {getFieldError('mobile') && <span className="cp-field-error">{getFieldError('mobile')}</span>}
           </div>
 
           {/* Alternate Email */}
@@ -192,36 +172,22 @@ const CompleteProfile = () => {
             />
           </div>
 
-            {/* Student — Mentor picker */}
-            <div className="cp-field" style={{ marginTop: '0.875rem' }}>
-              <label className="cp-label">
-                Assign a Mentor <span className="cp-optional">Optional</span>
-              </label>
-              <Select
-                className="cp-input cp-select" name="assignedMentor"
-                value={formData.assignedMentor}
-                onChange={e => setFormData(f => ({ ...f, assignedMentor: e.target.value }))}
-              >
-                <option value="">— No mentor assigned —</option>
-                {availableMentors.length === 0 ? (
-                  <option disabled>No approved mentors available yet</option>
-                ) : (
-                  availableMentors.map(m => (
-                    <option key={m._id} value={m._id}>
-                      {m.name}{m.department ? ` (${m.department})` : ''} — {m.email}
-                    </option>
-                  ))
-                )}
-              </Select>
+          {/* Mentor — Approval notice */}
+          <div className="cp-mentor-notice" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+            <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>⏳</span>
+            <div>
+              <strong>Pending Super Admin Approval</strong>
+              <p>Your Mentor Dashboard will be activated after a Super Admin reviews and approves your account. You can still access basic features in the meantime.</p>
             </div>
+          </div>
 
           {/* Submit */}
           <button type="submit" className="cp-submit" disabled={loading}>
             {loading ? (
-              <><span className="cp-spin" /> Saving Profile...</>
+              <><span className="cp-spin" /> Submitting...</>
             ) : (
               <>
-                Complete Profile
+                Submit Application
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6"/>
                 </svg>
@@ -231,12 +197,12 @@ const CompleteProfile = () => {
         </form>
         
         <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-          Are you joining as a Mentor?{' '}
+          Are you a Student?{' '}
           <span 
-            onClick={() => navigate('/mentor-setup')} 
+            onClick={() => navigate('/complete-profile')} 
             style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 600, textDecoration: 'underline' }}
           >
-            Apply here
+            Complete your profile here
           </span>
         </div>
       </div>
@@ -244,4 +210,4 @@ const CompleteProfile = () => {
   );
 };
 
-export default CompleteProfile;
+export default CreateMentorProfile;

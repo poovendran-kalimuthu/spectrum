@@ -30,7 +30,7 @@ export const getAdminAnalytics = async (req, res) => {
 // @desc    Create a new event
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, designation, resourcePersonImage, slug, noOfDays, dates } = req.body;
+    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, designation, resourcePersonImage, slug, noOfDays, dates, coordinators, approvalDetails } = req.body;
     
     const event = await Event.create({
       title,
@@ -55,6 +55,8 @@ export const createEvent = async (req, res) => {
       slug,
       noOfDays: eventType === 'macro' ? (noOfDays || 1) : 1,
       dates: eventType === 'macro' ? (dates || []) : [],
+      coordinators: coordinators || [],
+      approvalDetails: approvalDetails || null,
       createdBy: req.user._id
     });
     
@@ -634,7 +636,7 @@ Text to correct:
 ${text}`;
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

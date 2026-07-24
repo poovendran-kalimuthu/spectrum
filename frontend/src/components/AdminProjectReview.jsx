@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 import { ToastContainer, useToast } from './Toast';
 import './AdminProjectReview.css';
 
@@ -121,10 +122,11 @@ const AdminProjectReview = () => {
         ))}
 
         {submissions.length === 0 && (
-          <div className="apr-empty">
-            <span>📭</span>
-            <p>No projects submitted yet.</p>
-          </div>
+          <EmptyState
+            variant="projects"
+            title="No project submissions yet"
+            subtitle="Teams can submit projects once the submission window is open."
+          />
         )}
       </div>
 

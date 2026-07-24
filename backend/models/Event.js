@@ -55,6 +55,23 @@ const eventSchema = new mongoose.Schema({
     role: { type: String, default: 'Organizer' },
     avatar: { type: String }
   }],
+  approvalDetails: {
+    internalParticipants: { type: Number },
+    externalParticipants: { type: Number },
+    proposedBudget: { type: String },
+    actualSpentTillDate: { type: String },
+    availableBudget: { type: String },
+    nowRequested: { type: String },
+    advanceNote: { type: String },
+    budgetItems: [{
+      name: { type: String },
+      quantity: { type: String },
+      ratePerUnit: { type: String },
+      totalCost: { type: String },
+      modeOfArrangement: { type: String },
+      remarks: { type: String }
+    }]
+  },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 

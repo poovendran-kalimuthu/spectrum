@@ -225,41 +225,12 @@ Why You Should Participate:
 Don't miss out on this opportunity to learn, create, and lead. Register today!`;
 };
 
-// --- AI Grammar & Typos Polisher ---
-const checkAndFixGrammar = (text) => {
-  if (!text || text.trim() === '') return '';
-  
-  // 1. Common spelling & typo corrections
-  let polished = text
-    .replace(/\bteh\b/gi, 'the')
-    .replace(/\bgrammer\b/gi, 'grammar')
-    .replace(/\bswich\b/gi, 'switch')
-    .replace(/\brecieved\b/gi, 'received')
-    .replace(/\baccomodate\b/gi, 'accommodate')
-    .replace(/\bseperate\b/gi, 'separate')
-    .replace(/\buntill\b/gi, 'until')
-    .replace(/\bdevelopement\b/gi, 'development')
-    .replace(/\bprograming\b/gi, 'programming')
-    .replace(/\bchallange\b/gi, 'challenge')
-    .replace(/\bchallanges\b/gi, 'challenges')
-    .replace(/\b([a-z])i([a-z])\b/gi, 'I')
-    .replace(/\bi\b/g, 'I');
-
-  // 2. Clean up duplicate/multiple spaces
-  polished = polished.replace(/[ \t]+/g, ' ');
-
-  // 3. Clean up spacing around punctuation marks
-  polished = polished.replace(/\s+([,\.\!\?])/g, '$1');
-
-  // 4. Capitalize first letter of sentences
-  polished = polished.replace(/(^\s*[a-z]|[\.\!\?]\s+[a-z])/g, (match) => match.toUpperCase());
-
-  return polished.trim();
-};
 
 // --- Custom Calendar DatePicker ---
-const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
+const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name = 'date' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [rawInput, setRawInput] = useState('');
+  const [inputError, setInputError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (value) {
       const parts = value.split('-');
@@ -290,6 +261,44 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     return d.toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  // Sync display when value changes externally
+  useEffect(() => { setRawInput(value ? formatDateDisplay(value) : ''); }, [value]);
+
+  const parseTyped = (s) => {
+    if (!s || !s.trim()) return null;
+    let m;
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) { const d = new Date(+m[1],+m[2]-1,+m[3]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    return null;
+  };
+
+  const handleTextChange = (e) => {
+    const val = e.target.value;
+    setRawInput(val);
+    setInputError('');
+    if (!val.trim()) { onChange({ target: { name, value: '' } }); return; }
+    const parsed = parseTyped(val);
+    if (parsed) {
+      const y = parsed.getFullYear(), mo = String(parsed.getMonth()+1).padStart(2,'0'), dd = String(parsed.getDate()).padStart(2,'0');
+      onChange({ target: { name, value: `${y}-${mo}-${dd}` } });
+      setCurrentMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
+    }
+  };
+
+  const handleTextBlur = () => {
+    if (!rawInput.trim()) { setInputError(''); return; }
+    if (!parseTyped(rawInput)) {
+      setInputError('Invalid date — use DD/MM/YYYY or YYYY-MM-DD');
+    } else {
+      setInputError('');
+      setRawInput(formatDateDisplay(value));
+    }
+  };
+
   const selectedDate = value ? new Date(value + 'T00:00:00') : null;
 
   const handlePrevMonth = () => {
@@ -305,8 +314,9 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     const month = String(currentMonth.getMonth() + 1).padStart(2, '0');
     const dayStr = String(day).padStart(2, '0');
     const formatted = `${year}-${month}-${dayStr}`;
-    onChange({ target: { name: 'date', value: formatted } });
+    onChange({ target: { name, value: formatted } });
     setTimeout(() => setIsOpen(false), 150);
+    setInputError('');
   };
 
   const year = currentMonth.getFullYear();
@@ -331,37 +341,40 @@ const DatePicker = ({ value, onChange, placeholder = "Select Event Date" }) => {
     <div className="custom-datepicker" ref={containerRef}>
       <div 
         className="datepicker-input-wrapper"
-        onClick={() => setIsOpen(!isOpen)}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
       >
         <input 
           type="text" 
-          readOnly 
-          required
           placeholder={placeholder}
-          value={formatDateDisplay(value)} 
+          value={rawInput}
+          onChange={handleTextChange}
+          onBlur={handleTextBlur}
+          onFocus={() => setIsOpen(true)}
           className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
           style={{ 
             width: '100%', 
-            cursor: 'pointer', 
             paddingRight: '40px',
-            borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
-            boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
+            borderColor: inputError ? '#ef4444' : isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
+            boxShadow: inputError ? '0 0 0 3px rgba(239,68,68,0.12)' : isOpen ? 'var(--shadow-focus)' : 'none',
             transition: 'all var(--transition-base)'
           }}
         />
         <CalendarIcon 
           size={16} 
+          onClick={() => setIsOpen(v => !v)}
           style={{ 
             position: 'absolute', 
             right: '14px', 
-            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
+            color: inputError ? '#ef4444' : isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
             transform: isOpen ? 'scale(1.15) translateY(-1px)' : 'scale(1) translateY(0)',
             transition: 'all var(--transition-base)',
-            pointerEvents: 'none' 
+            cursor: 'pointer'
           }} 
         />
       </div>
+      {inputError && (
+        <small style={{ color: '#ef4444', fontSize: '0.71rem', marginTop: '3px', display: 'block' }}>{inputError}</small>
+      )}
 
       {isOpen && (
         <div className="datepicker-popover glass-strong">
@@ -741,8 +754,6 @@ const AdminEventDetail = () => {
   ]);
   const chatEndRef = useRef(null);
   const lastCheckedText = useRef('');
-  const [checkingGrammar, setCheckingGrammar] = useState(false);
-
 
 
   // Auto-scroll chat to bottom when new message arrives
@@ -768,29 +779,6 @@ const AdminEventDetail = () => {
       document.body.style.overflow = 'auto';
     };
   }, [showAddCoordinatorModal, showSubEventWizard]);
-
-  const handleAutoCheckGrammar = async () => {
-    if (!formData.description || formData.description.trim() === '') return;
-    if (formData.description === lastCheckedText.current) return;
-    
-    setCheckingGrammar(true);
-    try {
-      const res = await axios.post(
-        `${API_URL}/api/admin/ai/check-grammar`, 
-        { text: formData.description }, 
-        { withCredentials: true }
-      );
-      if (res.data.success && res.data.text && res.data.text !== formData.description) {
-        setFormData(prev => ({ ...prev, description: res.data.text }));
-        lastCheckedText.current = res.data.text;
-        showToast('Grammar automatically corrected by Gemini!', 'success');
-      }
-    } catch (err) {
-      console.warn("Auto grammar check failed:", err);
-    } finally {
-      setCheckingGrammar(false);
-    }
-  };
 
   useEffect(() => {
     fetchUser();
@@ -1837,18 +1825,22 @@ const AdminEventDetail = () => {
                     <input type="text" name="title" className="form-input" placeholder="Spectrum Event Name" value={formData.title} onChange={handleInputChange} />
                   </div>
 
+                  {formData.eventType !== 'macro' && (
+                    <div className="form-group">
+                      <label className="form-label">Event Category</label>
+                      <Select className="form-select" name="category" value={formData.category || 'None'} onChange={handleInputChange}>
+                        <option value="None">None</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Non-Technical">Non-Technical</option>
+                        <option value="Guest Lecture">Guest Lecture</option>
+                      </Select>
+                    </div>
+                  )}
+
                   <div className="form-group" style={{ position: 'relative' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label className="form-label" style={{ marginBottom: 0 }}>Event Description</label>
-                      <button 
-                        type="button" 
-                        className="btn btn-ghost btn-xs" 
-                        onClick={handleAutoCheckGrammar}
-                        disabled={checkingGrammar}
-                        style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--clr-accent)' }}
-                      >
-                        <SpellCheck size={12} /> {checkingGrammar ? 'Checking...' : 'Fix Grammar'}
-                      </button>
+                      <label className="form-label" style={{ marginBottom: 0 }}>Event Description <span style={{ color: '#ef4444' }}>*</span></label>
                     </div>
                     <textarea name="description" className="form-textarea" placeholder="Detailed description about the guidelines, requirements, format..." value={formData.description} onChange={handleInputChange} style={{ minHeight: '120px' }} />
                   </div>

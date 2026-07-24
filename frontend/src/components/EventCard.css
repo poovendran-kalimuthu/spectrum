@@ -315,6 +315,7 @@
 .evc-image-overlay-menu.active .evc-overlay-btn:nth-child(2) { transition-delay: 0.08s; }
 .evc-image-overlay-menu.active .evc-overlay-btn:nth-child(3) { transition-delay: 0.12s; }
 .evc-image-overlay-menu.active .evc-overlay-btn:nth-child(4) { transition-delay: 0.16s; }
+.evc-image-overlay-menu.active .evc-overlay-btn:nth-child(5) { transition-delay: 0.20s; }
 
 .evc-overlay-btn {
   display: flex;

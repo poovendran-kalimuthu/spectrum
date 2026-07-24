@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
+import EmptyState from './EmptyState';
 import './ParticipantsPanel.css';
 
 const ParticipantsPanel = ({ eventId, eventTitle, onClose }) => {
@@ -236,10 +237,23 @@ const ParticipantsPanel = ({ eventId, eventTitle, onClose }) => {
           {loading ? (
             <div className="pp-loading"><div className="pp-spin" /><span>Loading participants...</span></div>
           ) : filteredRegs.length === 0 ? (
-            <div className="pp-empty">
-              <span>{activeTab === 'shortlisted' ? '⭐' : '📭'}</span>
-              <p>{activeTab === 'shortlisted' ? 'No shortlisted teams yet' : search ? 'No results for your search' : 'No registrations yet'}</p>
-            </div>
+            <EmptyState
+              variant={
+                activeTab === 'shortlisted' ? 'shortlisted'
+                : search ? 'participants-search'
+                : 'participants'
+              }
+              title={
+                activeTab === 'shortlisted' ? 'No shortlisted teams yet'
+                : search ? 'No results for your search'
+                : 'No registrations yet'
+              }
+              subtitle={
+                activeTab === 'shortlisted' ? 'Mark teams as shortlisted to track your top picks here.'
+                : search ? 'Try a different name, team, or roll number.'
+                : 'Teams that register for this event will appear here.'
+              }
+            />
           ) : activeTab === 'teams' || activeTab === 'shortlisted' ? (
             /* ────── TEAM VIEW ────── */
             <div className="pp-teams-grid">
