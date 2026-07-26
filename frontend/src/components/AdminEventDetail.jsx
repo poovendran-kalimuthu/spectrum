@@ -3,26 +3,26 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 import Loader from './Loader';
-import './AdminEvents.css'; 
+import './AdminEvents.css';
 import EventCountdown from './EventCountdown';
 import Select from './ui/Select';
-import { 
-  Calendar as CalendarIcon, 
-  MapPin, 
-  Users, 
-  CheckCircle2, 
-  AlertCircle, 
-  XCircle, 
-  ArrowLeft, 
-  Plus, 
+import {
+  Calendar as CalendarIcon,
+  MapPin,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+  ArrowLeft,
+  Plus,
   Minus,
-  X, 
-  FileText, 
-  MessageSquare, 
-  Zap, 
-  Eye, 
-  ChevronLeft, 
-  ChevronRight, 
+  X,
+  FileText,
+  MessageSquare,
+  Zap,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
   Layers,
   Sparkles,
   Image as ImageIcon,
@@ -95,24 +95,24 @@ const getLocalDateString = (dateInput) => {
 
 const updateConsecutiveDates = (start, end, currentFormData) => {
   if (!start) return { ...currentFormData, date: '', noOfDays: 1, dates: [], endDate: end || '' };
-  
+
   const formattedStart = start;
   let formattedEnd = end || start;
-  
+
   if (formattedEnd && new Date(formattedEnd) < new Date(formattedStart)) {
     formattedEnd = formattedStart;
   }
-  
+
   const dates = [];
   const sDate = new Date(formattedStart + 'T00:00:00');
   const eDate = new Date(formattedEnd + 'T00:00:00');
-  
+
   let tempDate = new Date(sDate);
   while (tempDate <= eDate) {
     dates.push(tempDate.toISOString().split('T')[0]);
     tempDate.setDate(tempDate.getDate() + 1);
   }
-  
+
   return {
     ...currentFormData,
     date: formattedStart,
@@ -126,11 +126,11 @@ const updateConsecutiveDates = (start, end, currentFormData) => {
 const generateAIDescription = (title, prompt = '') => {
   if (!title || title.trim() === '') return '';
   const titleLower = title.toLowerCase();
-  
-  const customIntro = prompt 
-    ? `Specifically, this session is focused on: "${prompt}".` 
+
+  const customIntro = prompt
+    ? `Specifically, this session is focused on: "${prompt}".`
     : `This high-octane technical challenge is designed to push your problem-solving abilities to the absolute limit.`;
-  
+
   if (titleLower.includes('code') || titleLower.includes('program') || titleLower.includes('hack') || titleLower.includes('algo') || titleLower.includes('dev') || titleLower.includes('web') || titleLower.includes('app')) {
     return `Are you ready to test your engineering prowess and coding skills? Join us for the "${title}"! 
 
@@ -146,7 +146,7 @@ Key Highlights:
 
 Bring your laptop, charge your devices, and prepare to code your way to the top!`;
   }
-  
+
   if (titleLower.includes('game') || titleLower.includes('play') || titleLower.includes('sport') || titleLower.includes('combat') || titleLower.includes('console') || titleLower.includes('lan') || titleLower.includes('fifa') || titleLower.includes('valorant') || titleLower.includes('pubg')) {
     return `Welcome to the arena! Prepare your gears and team up for the "${title}"!
 
@@ -162,7 +162,7 @@ Highlights:
 
 Register now and secure your spot in the championship bracket. May the best squad win!`;
   }
-  
+
   if (titleLower.includes('paper') || titleLower.includes('quiz') || titleLower.includes('present') || titleLower.includes('talk') || titleLower.includes('seminar') || titleLower.includes('lecture') || titleLower.includes('confe')) {
     return `Expand your horizons and showcase your knowledge at the "${title}"!
 
@@ -177,7 +177,7 @@ Tracks & Focus:
 
 Submit your abstracts early or register to participate. Let the pursuit of knowledge begin!`;
   }
-  
+
   if (titleLower.includes('robot') || titleLower.includes('circ') || titleLower.includes('embedded') || titleLower.includes('hard') || titleLower.includes('iot') || titleLower.includes('sensor')) {
     return `Dive into the world of automation, hardware design, and robotics at the "${title}"!
 
@@ -193,7 +193,7 @@ What to Expect:
 
 Assemble your team, bring your components, and build the future today!`;
   }
-  
+
   if (titleLower.includes('design') || titleLower.includes('ui') || titleLower.includes('ux') || titleLower.includes('art') || titleLower.includes('poster') || titleLower.includes('creative') || titleLower.includes('cad') || titleLower.includes('photo')) {
     return `Unleash your creativity and design thinking at the "${title}"!
 
@@ -209,7 +209,7 @@ Key Focus Areas:
 
 Bring your creative tools, design libraries, and register today to transform ideas into interfaces!`;
   }
-  
+
   return `Welcome to the "${title}"!
 
 ${customIntro}
@@ -268,11 +268,11 @@ const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name
     if (!s || !s.trim()) return null;
     let m;
     m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (m) { const d = new Date(+m[1],+m[2]-1,+m[3]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    if (m) { const d = new Date(+m[1], +m[2] - 1, +m[3]); if (!isNaN(d) && d.getMonth() === +m[2] - 1) return d; }
     m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    if (m) { const d = new Date(+m[3], +m[2] - 1, +m[1]); if (!isNaN(d) && d.getMonth() === +m[2] - 1) return d; }
     m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-    if (m) { const d = new Date(+m[3],+m[2]-1,+m[1]); if (!isNaN(d)&&d.getMonth()===+m[2]-1) return d; }
+    if (m) { const d = new Date(+m[3], +m[2] - 1, +m[1]); if (!isNaN(d) && d.getMonth() === +m[2] - 1) return d; }
     return null;
   };
 
@@ -283,7 +283,7 @@ const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name
     if (!val.trim()) { onChange({ target: { name, value: '' } }); return; }
     const parsed = parseTyped(val);
     if (parsed) {
-      const y = parsed.getFullYear(), mo = String(parsed.getMonth()+1).padStart(2,'0'), dd = String(parsed.getDate()).padStart(2,'0');
+      const y = parsed.getFullYear(), mo = String(parsed.getMonth() + 1).padStart(2, '0'), dd = String(parsed.getDate()).padStart(2, '0');
       onChange({ target: { name, value: `${y}-${mo}-${dd}` } });
       setCurrentMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
     }
@@ -339,37 +339,37 @@ const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name
 
   return (
     <div className="custom-datepicker" ref={containerRef}>
-      <div 
+      <div
         className="datepicker-input-wrapper"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
       >
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder={placeholder}
           value={rawInput}
           onChange={handleTextChange}
           onBlur={handleTextBlur}
           onFocus={() => setIsOpen(true)}
           className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
-          style={{ 
-            width: '100%', 
+          style={{
+            width: '100%',
             paddingRight: '40px',
             borderColor: inputError ? '#ef4444' : isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
             boxShadow: inputError ? '0 0 0 3px rgba(239,68,68,0.12)' : isOpen ? 'var(--shadow-focus)' : 'none',
             transition: 'all var(--transition-base)'
           }}
         />
-        <CalendarIcon 
-          size={16} 
+        <CalendarIcon
+          size={16}
           onClick={() => setIsOpen(v => !v)}
-          style={{ 
-            position: 'absolute', 
-            right: '14px', 
-            color: inputError ? '#ef4444' : isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
+          style={{
+            position: 'absolute',
+            right: '14px',
+            color: inputError ? '#ef4444' : isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)',
             transform: isOpen ? 'scale(1.15) translateY(-1px)' : 'scale(1) translateY(0)',
             transition: 'all var(--transition-base)',
             cursor: 'pointer'
-          }} 
+          }}
         />
       </div>
       {inputError && (
@@ -397,16 +397,16 @@ const DatePicker = ({ value, onChange, placeholder = "Type or pick a date", name
           <div className="datepicker-days">
             {days.map((day, idx) => {
               if (day === null) return <div key={`empty-${idx}`} />;
-              
-              const isSelected = selectedDate && 
-                                 selectedDate.getDate() === day && 
-                                 selectedDate.getMonth() === month && 
-                                 selectedDate.getFullYear() === year;
+
+              const isSelected = selectedDate &&
+                selectedDate.getDate() === day &&
+                selectedDate.getMonth() === month &&
+                selectedDate.getFullYear() === year;
 
               const today = new Date();
               const isToday = today.getDate() === day &&
-                              today.getMonth() === month &&
-                              today.getFullYear() === year;
+                today.getMonth() === month &&
+                today.getFullYear() === year;
 
               return (
                 <button
@@ -434,7 +434,7 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
   let initHour = 9;
   let initMin = 0;
   let initAmPm = 'AM';
-  
+
   if (value) {
     const [h, m] = value.split(':');
     let hr = parseInt(h);
@@ -466,10 +466,10 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
     let hr24 = h;
     if (ap === 'PM' && h !== 12) hr24 += 12;
     if (ap === 'AM' && h === 12) hr24 = 0;
-    
+
     const hrStr = String(hr24).padStart(2, '0');
     const minStr = String(m).padStart(2, '0');
-    
+
     onChange({ target: { name, value: `${hrStr}:${minStr}` } });
   };
 
@@ -506,9 +506,9 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
           placeholder={placeholder}
           value={formatDisplay()}
           className={`form-input datepicker-display-input ${isOpen ? 'active' : ''}`}
-          style={{ 
-            width: '100%', 
-            cursor: 'pointer', 
+          style={{
+            width: '100%',
+            cursor: 'pointer',
             paddingRight: '40px',
             borderColor: isOpen ? 'var(--clr-accent)' : 'var(--clr-border)',
             boxShadow: isOpen ? 'var(--shadow-focus)' : 'none',
@@ -517,13 +517,13 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
         />
         <Clock
           size={16}
-          style={{ 
-            position: 'absolute', 
-            right: '14px', 
-            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)', 
+          style={{
+            position: 'absolute',
+            right: '14px',
+            color: isOpen ? 'var(--clr-accent)' : 'var(--clr-text-muted)',
             transform: isOpen ? 'scale(1.15) rotate(15deg)' : 'scale(1) rotate(0deg)',
             transition: 'all var(--transition-base)',
-            pointerEvents: 'none' 
+            pointerEvents: 'none'
           }}
         />
       </div>
@@ -531,15 +531,15 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
       {isOpen && (
         <div className="datepicker-popover animate-scale-in glass-strong" style={{ width: '280px', padding: '1rem', zIndex: 1000 }}>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => handleAmPmSelect('AM')}
               style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'AM' ? '#0f172a' : '#f8fafc', color: ampm === 'AM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
             >
               AM
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => handleAmPmSelect('PM')}
               style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', background: ampm === 'PM' ? '#0f172a' : '#f8fafc', color: ampm === 'PM' ? '#fff' : '#0f172a', border: '1px solid #e2e8f0', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all var(--transition-base)' }}
             >
@@ -549,15 +549,15 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
 
           <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hour</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px', marginBottom: '1.25rem' }}>
-            {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
               <button
                 key={h}
                 type="button"
                 onClick={() => handleHourSelect(h)}
-                style={{ 
-                  padding: '6px 0', 
-                  borderRadius: '4px', 
-                  fontSize: '0.8rem', 
+                style={{
+                  padding: '6px 0',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   background: hour === h ? '#0f172a' : 'transparent',
@@ -578,10 +578,10 @@ const TimePicker = ({ value, onChange, name, placeholder = "Select Time" }) => {
                 key={m}
                 type="button"
                 onClick={() => handleMinuteSelect(m)}
-                style={{ 
-                  padding: '6px 0', 
-                  borderRadius: '4px', 
-                  fontSize: '0.8rem', 
+                style={{
+                  padding: '6px 0',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   background: minute === m ? '#0f172a' : 'transparent',
@@ -670,8 +670,8 @@ const StepperInput = ({ value, onChange, name, min = 0, max = Infinity, placehol
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', background: 'var(--clr-surface)', border: '1.5px solid var(--clr-border)', borderRadius: '10px', overflow: 'hidden', height: '42px', transition: 'all var(--transition-base)' }}>
-      <button 
-        type="button" 
+      <button
+        type="button"
         onClick={handleDecrement}
         style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderRight: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
         onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
@@ -679,16 +679,16 @@ const StepperInput = ({ value, onChange, name, min = 0, max = Infinity, placehol
       >
         <Minus size={16} />
       </button>
-      <input 
-        type="text" 
+      <input
+        type="text"
         name={name}
-        value={value} 
+        value={value}
         onChange={handleChange}
         placeholder={placeholder}
         style={{ flex: 1, height: '100%', border: 'none', textAlign: 'center', background: 'transparent', fontWeight: 600, color: 'var(--clr-text-heading)', fontSize: '0.9rem', outline: 'none' }}
       />
-      <button 
-        type="button" 
+      <button
+        type="button"
         onClick={handleIncrement}
         style={{ width: '42px', height: '100%', background: 'transparent', border: 'none', borderLeft: '1.5px solid var(--clr-border)', color: 'var(--clr-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all var(--transition-base)' }}
         onMouseOver={(e) => { e.currentTarget.style.background = 'var(--clr-surface-2)'; e.currentTarget.style.color = 'var(--clr-heading)'; }}
@@ -710,9 +710,46 @@ const AdminEventDetail = () => {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ text: '', type: '' });
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [reportConfig, setReportConfig] = useState({
+    coordinatorName: '',
+    participantsClass: 'Second Year ECE-A & ACT',
+    participantCount: '92',
+    venueName: '',
+    assocIIC: 'No',
+    feedbackActive: 'Yes',
+    execSummary: '',
+    highlights: [
+      'The session was led by Mr. P. Michael Stalin Soft Skill Trainer, who shared his expertise using real-time examples and provided a clear vision to help students groom themselves and get ready for placements.',
+      'The session emphasized the idea that perspective shapes thinking and desperation drives action beyond comfort zones.',
+      'Guidance was provided to understand that resilience and sustainability come from adaptability and continuous self-assessment.',
+      'Students learned that industry values ownership, innovation and execution beyond academic performance.'
+    ],
+    photo1: '',
+    photo2: '',
+    presidentName: 'Sneka Venkateswari M',
+    secretaryName: '',
+    facultyIncharge: 'Ms. N. Sugirtham',
+    progCoordinator: 'Dr. R. Sherine Jenny',
+    hodName: 'Dr. V. K. Sudha'
+  });
+
+  const handlePhotoUpload = (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReportConfig(prev => ({
+          ...prev,
+          [`photo${index}`]: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const [allEvents, setAllEvents] = useState([]);
   const [venues, setVenues] = useState([]);
   const [registrations, setRegistrations] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [showAddCoordinatorModal, setShowAddCoordinatorModal] = useState(false);
   const [newCoordinator, setNewCoordinator] = useState({ name: '', email: '', role: 'Lead Coordinator' });
   const [coordUsers, setCoordUsers] = useState([]);
@@ -780,11 +817,21 @@ const AdminEventDetail = () => {
     };
   }, [showAddCoordinatorModal, showSubEventWizard]);
 
+  const [feedbackTemplates, setFeedbackTemplates] = useState([]);
+
   useEffect(() => {
     fetchUser();
     fetchEvent();
     fetchVenues();
+    fetchFeedbackTemplates();
   }, [id]);
+
+  const fetchFeedbackTemplates = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/feedback/templates`, { withCredentials: true });
+      if (res.data.success) setFeedbackTemplates(res.data.data);
+    } catch (err) { console.error("Error fetching feedback templates:", err); }
+  };
 
   const fetchVenues = async () => {
     try {
@@ -830,8 +877,18 @@ const AdminEventDetail = () => {
                 }
               })
               .catch(rErr => console.error("Error fetching registrations:", rErr));
+
+            // Fetch feedbacks for metrics
+            axios.get(`${API_URL}/api/feedback`, { withCredentials: true })
+              .then(feedbackRes => {
+                if (feedbackRes.data.success) {
+                  const filtered = feedbackRes.data.data.filter(f => f.event?._id === ev._id);
+                  setFeedbacks(filtered);
+                }
+              })
+              .catch(fErr => console.error("Error fetching feedbacks:", fErr));
           } catch (rErr) {
-            console.error("Error outside registrations fetch:", rErr);
+            console.error("Error outside metrics fetch:", rErr);
           }
 
           setFormData({
@@ -850,6 +907,7 @@ const AdminEventDetail = () => {
             isPublished: ev.isPublished,
             isRegistrationOpen: ev.isRegistrationOpen !== undefined ? ev.isRegistrationOpen : true,
             isTeamChangeAllowed: ev.isTeamChangeAllowed !== undefined ? ev.isTeamChangeAllowed : true,
+            isFeedbackOpen: ev.isFeedbackOpen !== undefined ? ev.isFeedbackOpen : true,
             attendanceMode: ev.attendanceMode || 'student_scan',
             eventType: ev.eventType || 'micro',
             parentEvent: ev.parentEvent || '',
@@ -861,7 +919,8 @@ const AdminEventDetail = () => {
             noOfDays: ev.noOfDays || 1,
             dates: ev.dates && ev.dates.length > 0 ? ev.dates.map(d => getLocalDateString(d)) : [],
             endDate: ev.dates && ev.dates.length > 0 ? getLocalDateString(ev.dates[ev.dates.length - 1]) : (ev.date ? getLocalDateString(ev.date) : ''),
-            coordinators: ev.coordinators || []
+            coordinators: ev.coordinators || [],
+            feedbackTemplate: ev.feedbackTemplate?._id || ev.feedbackTemplate || ''
           });
         }
       }
@@ -875,11 +934,24 @@ const AdminEventDetail = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState('');
 
+  useEffect(() => {
+    if (event) {
+      setReportConfig(prev => ({
+        ...prev,
+        coordinatorName: event.resourcePerson || event.coordinators?.map(c => c.name).join(', ') || prev.coordinatorName || 'Ms. N. Sugirtham',
+        venueName: event.location || prev.venueName || 'Electrical Seminar Hall',
+        participantCount: registrations.length ? String(registrations.length) : (prev.participantCount || '92'),
+        feedbackActive: event.isFeedbackOpen !== false ? 'Yes' : 'No',
+        execSummary: prev.execSummary || `The ECE Department Association hosted ${event.title || 'the event'} for Second Year ECE-A & ACT students. The event focused on ${event.description ? event.description.substring(0, 220) : 'improving student\'s communication skills and preparing them for placement opportunities by enhancing the essential skills required by industry.'}`
+      }));
+    }
+  }, [event, registrations]);
+
   const handleRemoveCoordinator = async (index) => {
     const newCoordinators = formData.coordinators.filter((_, idx) => idx !== index);
     const updatedFormData = { ...formData, coordinators: newCoordinators };
     setFormData(updatedFormData);
-    
+
     try {
       const res = await axios.put(`${API_URL}/api/admin/events/${event._id}`, updatedFormData, { withCredentials: true });
       if (res.data.success) {
@@ -919,21 +991,21 @@ const AdminEventDetail = () => {
       showToast('This user is already a coordinator.', 'error');
       return;
     }
-    
+
     const newCoordinators = [...(formData.coordinators || []), {
       name: selectedCoordUser.name,
       email: selectedCoordUser.email,
       role: newCoordinator.role,
       avatar: ''
     }];
-    
+
     const updatedFormData = { ...formData, coordinators: newCoordinators };
     setFormData(updatedFormData);
-    
+
     setShowAddCoordinatorModal(false);
     setSelectedCoordUser(null);
     setNewCoordinator({ name: '', email: '', role: 'Lead Coordinator' });
-    
+
     try {
       const res = await axios.put(`${API_URL}/api/admin/events/${event._id}`, updatedFormData, { withCredentials: true });
       if (res.data.success) {
@@ -950,7 +1022,7 @@ const AdminEventDetail = () => {
     try {
       const updatedFormData = { ...formData, description: tempDescription };
       setFormData(updatedFormData);
-      
+
       const res = await axios.put(`${API_URL}/api/admin/events/${event._id}`, updatedFormData, { withCredentials: true });
       if (res.data.success) {
         setEvent(res.data.event);
@@ -976,6 +1048,38 @@ const AdminEventDetail = () => {
       showToast('Failed to save event changes.', 'error');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const toggleFeedbackStatus = async () => {
+    try {
+      const updatedStatus = event.isFeedbackOpen === false ? true : false;
+      const res = await axios.put(`${API_URL}/api/admin/events/${event._id}`, {
+        ...formData,
+        isFeedbackOpen: updatedStatus
+      }, { withCredentials: true });
+      if (res.data.success) {
+        setEvent(res.data.event);
+        setFormData(prev => ({ ...prev, isFeedbackOpen: updatedStatus }));
+        showToast(`Feedback submissions ${updatedStatus ? 'opened' : 'closed'} successfully!`);
+      }
+    } catch (err) {
+      console.error("Error toggling feedback status:", err);
+      showToast("Failed to update feedback status.", "error");
+    }
+  };
+
+  const handleDeleteFeedback = async (feedbackId) => {
+    if (!window.confirm("Are you sure you want to delete this feedback? This action cannot be undone.")) return;
+    try {
+      const res = await axios.delete(`${API_URL}/api/feedback/${feedbackId}`, { withCredentials: true });
+      if (res.data.success) {
+        setFeedbacks(prev => prev.filter(f => f._id !== feedbackId));
+        showToast("Feedback deleted successfully.");
+      }
+    } catch (err) {
+      console.error("Error deleting feedback:", err);
+      showToast("Failed to delete feedback.", "error");
     }
   };
 
@@ -1058,7 +1162,7 @@ const AdminEventDetail = () => {
         const MAX_WIDTH = 800;
         let width = img.width;
         let height = img.height;
-        
+
         if (width > MAX_WIDTH) {
           height = height * (MAX_WIDTH / width);
           width = MAX_WIDTH;
@@ -1082,7 +1186,7 @@ const AdminEventDetail = () => {
     let val = parseInt(e.target.value) || 1;
     if (val < 1) val = 1;
     if (val > 10) val = 10;
-    
+
     setFormData(prev => {
       let newConfig = [...(prev.roundConfig || [])];
       if (val > newConfig.length) {
@@ -1107,7 +1211,7 @@ const AdminEventDetail = () => {
   const addRound = () => {
     setFormData(prev => {
       const newRoundNumber = (prev.roundConfig ? prev.roundConfig.length : 0) + 1;
-      const newConfig = [...(prev.roundConfig || []), { 
+      const newConfig = [...(prev.roundConfig || []), {
         roundNumber: newRoundNumber, name: '', evaluationType: 'admin', criteria: [{ name: 'Overall', maxScore: 10 }], maxAdvance: 0
       }];
       return { ...prev, roundConfig: newConfig, rounds: newConfig.length };
@@ -1202,7 +1306,7 @@ const AdminEventDetail = () => {
         const MAX_WIDTH = 800;
         let width = img.width;
         let height = img.height;
-        
+
         if (width > MAX_WIDTH) {
           height = height * (MAX_WIDTH / width);
           width = MAX_WIDTH;
@@ -1256,7 +1360,7 @@ const AdminEventDetail = () => {
   return (
     <div className="ae-wizard-overlay" style={{ position: 'relative', minHeight: '100vh', padding: '2rem 1.75rem', display: 'block', background: 'var(--clr-bg)' }}>
       <PremiumToast toast={toast} onClose={() => setToast({ text: '', type: '' })} />
-      
+
       {/* Editor Header */}
       <header className="ae-header">
         <div className="ae-header-left">
@@ -1306,14 +1410,14 @@ const AdminEventDetail = () => {
               <div className="adb-card">
                 <div className="skeleton adb-skel-title" />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
-                  {[0,1,2,3].map(i => <div key={i} className="skeleton adb-skel-coord-card" />)}
+                  {[0, 1, 2, 3].map(i => <div key={i} className="skeleton adb-skel-coord-card" />)}
                 </div>
               </div>
             </div>
             <div className="adb-col-right">
               <div className="adb-card">
                 <div className="skeleton adb-skel-title" />
-                {[0,1,2,3,4].map(i => <div key={i} className="skeleton adb-skel-meta-row" />)}
+                {[0, 1, 2, 3, 4].map(i => <div key={i} className="skeleton adb-skel-meta-row" />)}
               </div>
               <div className="adb-card">
                 <div className="skeleton adb-skel-title" />
@@ -1387,16 +1491,49 @@ const AdminEventDetail = () => {
                 <h3>Attendance Control</h3>
                 <p>Scan participant QR codes or manually verify presence.</p>
                 <div className="adb-module-bottom">
-                   <div className="adb-fake-pills">
-                     {event?.activeAttendance?.sessionToken ? (
-                       <div className="adb-fake-pill green">Session Open</div>
-                     ) : (
-                       <div className="adb-fake-pill gray">Session Closed</div>
-                     )}
-                     <div className="adb-fake-pill" style={{ background: 'var(--clr-surface-2)', color: 'var(--clr-text-muted)', borderLeft: '3px solid var(--clr-accent)' }}>
-                       {registrations.reduce((acc, reg) => acc + (reg.attendance?.filter(a => a.status === 'Present').length || 0), 0)} Marked
-                     </div>
-                   </div>
+                  <div className="adb-fake-pills">
+                    {event?.activeAttendance?.sessionToken ? (
+                      <div className="adb-fake-pill green">Session Open</div>
+                    ) : (
+                      <div className="adb-fake-pill gray">Session Closed</div>
+                    )}
+                    <div className="adb-fake-pill" style={{ background: 'var(--clr-surface-2)', color: 'var(--clr-text-muted)', borderLeft: '3px solid var(--clr-accent)' }}>
+                      {registrations.reduce((acc, reg) => acc + (reg.attendance?.filter(a => a.status === 'Present').length || 0), 0)} Marked
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="adb-module-card-v2" onClick={() => setActiveTab('feedback')}>
+                <div className="adb-module-icon-wrapper" style={{ borderColor: '#ec4899', color: '#ec4899' }}>
+                  <MessageSquare size={22} strokeWidth={1.5} />
+                </div>
+                <h3>Feedback Control</h3>
+                <p>Monitor attendee feedback, view ratings, and toggle input availability.</p>
+                <div className="adb-module-bottom">
+                  <div className="adb-fake-pills">
+                    {event?.isFeedbackOpen !== false ? (
+                      <div className="adb-fake-pill green" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', borderColor: '#ec4899' }}>Accepting</div>
+                    ) : (
+                      <div className="adb-fake-pill gray">Suspended</div>
+                    )}
+                    <div className="adb-fake-pill" style={{ background: 'var(--clr-surface-2)', color: 'var(--clr-text-muted)', borderLeft: '3px solid #ec4899' }}>
+                      {feedbacks.length} Responses
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="adb-module-card-v2" onClick={() => setActiveTab('report')}>
+                <div className="adb-module-icon-wrapper" style={{ borderColor: '#6366f1', color: '#6366f1' }}>
+                  <FileText size={22} strokeWidth={1.5} />
+                </div>
+                <h3>Generate Report</h3>
+                <p>Compile and print event data in official SPECTRUM PDF formats.</p>
+                <div className="adb-module-bottom">
+                  <div className="adb-fake-pills">
+                    <div className="adb-fake-pill" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', borderLeft: '3px solid #6366f1' }}>
+                      Ready to Print
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1404,390 +1541,1279 @@ const AdminEventDetail = () => {
           <div className="adb-container">
             {/* Left Column */}
             <div className="adb-col-left">
-            {/* About Event Card */}
-            <div className="adb-card adb-card-animate stagger-1">
-              <div className="adb-card-header">
-                <h3 className="adb-card-title">
-                  <FileText size={18} style={{ color: 'var(--clr-accent)' }} />
-                  About Event
-                </h3>
-                {isEditingDescription ? (
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn btn-sm btn-ghost" onClick={() => setIsEditingDescription(false)}>Cancel</button>
-                    <button className="btn btn-sm btn-primary" onClick={handleDescriptionSave} style={{ background: 'var(--clr-accent)', borderColor: 'var(--clr-accent)' }}>Save</button>
-                  </div>
-                ) : (
-                  <button className="adb-edit-btn" onClick={() => {
-                    setTempDescription(formData.description || '');
-                    setIsEditingDescription(true);
-                  }}>
-                    <Edit3 size={14} />
-                    Edit
-                  </button>
-                )}
-              </div>
-              <div className="adb-card-body">
-                {isEditingDescription ? (
-                  <textarea
-                    className="form-textarea"
-                    value={tempDescription}
-                    onChange={(e) => setTempDescription(e.target.value)}
-                    style={{ width: '100%', minHeight: '120px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--clr-border)', fontFamily: 'var(--font-body)', fontSize: '0.9rem' }}
-                  />
-                ) : (
-                  <p className="adb-desc-text">{formData.description || 'No description provided.'}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Event Coordinators Card */}
-            <div className="adb-card adb-card-animate stagger-2">
-              <div className="adb-card-header">
-                <h3 className="adb-card-title">
-                  <Users size={18} style={{ color: 'var(--clr-accent)' }} />
-                  Event Coordinators
-                </h3>
-              </div>
-              <div className="adb-card-body">
-                <div className="adb-coordinators-list">
-                  {(!formData.coordinators || formData.coordinators.length === 0) ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', background: 'var(--clr-surface-2)', borderRadius: '12px', border: '1px dashed var(--clr-border)', marginBottom: '1rem' }}>
-                      <div style={{ background: '#f8fafc', color: '#94a3b8', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                        <Users size={24} strokeWidth={1.5} />
-                      </div>
-                      <h4 style={{ margin: '0 0 6px', color: 'var(--clr-text-heading)', fontSize: '0.95rem', fontWeight: '600' }}>No Coordinators Assigned</h4>
-                      <p style={{ margin: '0', color: 'var(--clr-text-muted)', fontSize: '0.8125rem', textAlign: 'center', maxWidth: '80%' }}>Add team members to help you manage this event.</p>
+              {/* About Event Card */}
+              <div className="adb-card adb-card-animate stagger-1">
+                <div className="adb-card-header">
+                  <h3 className="adb-card-title">
+                    <FileText size={18} style={{ color: 'var(--clr-accent)' }} />
+                    About Event
+                  </h3>
+                  {isEditingDescription ? (
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn btn-sm btn-ghost" onClick={() => setIsEditingDescription(false)}>Cancel</button>
+                      <button className="btn btn-sm btn-primary" onClick={handleDescriptionSave} style={{ background: 'var(--clr-accent)', borderColor: 'var(--clr-accent)' }}>Save</button>
                     </div>
                   ) : (
-                    (formData.coordinators || []).map((coord, idx) => {
-                      const initials = coord.name ? coord.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'C';
-                      const bgColors = ['#eff6ff', '#f5f3ff', '#fffbeb', '#ecfdf5'];
-                      const textColors = ['#2563eb', '#7c3aed', '#d97706', '#059669'];
-                      const colorIdx = idx % bgColors.length;
-                      
-                      return (
-                        <div className="adb-coordinator-card" key={idx}>
-                          <div className="adb-coordinator-info">
-                            <div 
-                              className="adb-coordinator-avatar" 
-                              style={{ backgroundColor: bgColors[colorIdx], color: textColors[colorIdx] }}
-                            >
-                              {initials}
-                            </div>
-                            <div className="adb-coordinator-details">
-                              <span className="adb-coordinator-name" title={coord.name}>{coord.name}</span>
-                              <span className="adb-coordinator-email" title={coord.email}>{coord.email}</span>
-                              <span className="adb-coordinator-role">{coord.role}</span>
-                            </div>
-                          </div>
-                          <button 
-                            className="adb-coordinator-delete" 
-                            onClick={() => handleRemoveCoordinator(idx)}
-                            title="Remove Coordinator"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      );
-                    })
+                    <button className="adb-edit-btn" onClick={() => {
+                      setTempDescription(formData.description || '');
+                      setIsEditingDescription(true);
+                    }}>
+                      <Edit3 size={14} />
+                      Edit
+                    </button>
                   )}
                 </div>
-                <button 
-                  onClick={() => openAddCoordinatorModal()}
-                  style={{
-                    display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    padding: '0.875rem', background: 'transparent', border: '1px dashed var(--clr-border)',
-                    borderRadius: '12px', color: 'var(--clr-text-heading)', fontWeight: '600',
-                    fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', marginTop: '1rem'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--clr-text-muted)'; e.currentTarget.style.background = 'var(--clr-surface-2)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--clr-border)'; e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <Plus size={16} /> Add Coordinator
-                </button>
+                <div className="adb-card-body">
+                  {isEditingDescription ? (
+                    <textarea
+                      className="form-textarea"
+                      value={tempDescription}
+                      onChange={(e) => setTempDescription(e.target.value)}
+                      style={{ width: '100%', minHeight: '120px', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--clr-border)', fontFamily: 'var(--font-body)', fontSize: '0.9rem' }}
+                    />
+                  ) : (
+                    <p className="adb-desc-text">{formData.description || 'No description provided.'}</p>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Progress Metrics Card */}
-            <div className="adb-card adb-card-animate stagger-3">
-              <div className="adb-card-header">
-                <h3 className="adb-card-title">
-                  <Zap size={18} style={{ color: 'var(--clr-accent)' }} />
-                  Progress & Registration Metrics
-                </h3>
-                <button className="adb-edit-btn" onClick={() => setActiveTab(3)}>
-                  <Sliders size={14} />
-                  Limits Setup
-                </button>
-              </div>
-              <div className="adb-card-body">
-                <div className="adb-progress-layout">
-                  {/* Gauge 1: Registration Capacity */}
-                  <div className="adb-chart-container">
-                    {(() => {
-                      const limit = formData.maxShortlisted || 30;
-                      const count = registrations.length;
-                      const percentage = Math.min(100, limit > 0 ? Math.round((count / limit) * 100) : 0);
-                      const strokeDash = (percentage / 100) * 251.2;
-                      return (
-                        <>
-                          <svg width="120" height="120" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f1f5f9" strokeWidth="8" />
-                            <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--clr-accent)" strokeWidth="8"
-                              strokeDasharray="251.2" strokeDashoffset={251.2 - strokeDash} strokeLinecap="round"
-                              transform="rotate(-90 50 50)" className="adb-gauge-circle" />
-                            <text x="50" y="55" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#0f172a" fontFamily="var(--font-heading)">
-                              {percentage}%
-                            </text>
-                          </svg>
-                          <span className="adb-chart-title">Registration Capacity ({count}/{limit})</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Gauge 2: Verification Status */}
-                  <div className="adb-chart-container">
-                    {(() => {
-                      const shortlisted = registrations.filter(r => r.isShortlisted && !r.isDisqualified).length;
-                      const disqualified = registrations.filter(r => r.isDisqualified).length;
-                      const pending = registrations.filter(r => !r.isShortlisted && !r.isDisqualified).length;
-                      const total = registrations.length || 1;
-                      
-                      const shortlistedPct = Math.round((shortlisted / total) * 100);
-                      const disqualifiedPct = Math.round((disqualified / total) * 100);
-                      const pendingPct = Math.max(0, 100 - shortlistedPct - disqualifiedPct);
-                      
-                      return (
-                        <>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '240px', padding: '10px 0' }}>
-                            <div style={{ height: '12px', width: '100%', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
-                              <div className="adb-status-bar-fill" style={{ width: `${shortlistedPct}%`, background: 'var(--clr-success)', height: '100%', transition: 'width 0.9s ease' }} title={`Shortlisted: ${shortlistedPct}%`} />
-                              <div className="adb-status-bar-fill" style={{ width: `${pendingPct}%`, background: 'var(--clr-accent)', height: '100%', transition: 'width 0.9s ease' }} title={`Pending: ${pendingPct}%`} />
-                              <div className="adb-status-bar-fill" style={{ width: `${disqualifiedPct}%`, background: 'var(--clr-danger)', height: '100%', transition: 'width 0.9s ease' }} title={`Disqualified: ${disqualifiedPct}%`} />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.75rem', color: 'var(--clr-text-muted)', width: '100%' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ width: '8px', height: '8px', background: 'var(--clr-success)', borderRadius: '50%' }} />
-                                Shortlisted: {shortlisted} ({shortlistedPct}%)
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ width: '8px', height: '8px', background: 'var(--clr-accent)', borderRadius: '50%' }} />
-                                Pending: {pending} ({pendingPct}%)
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ width: '8px', height: '8px', background: 'var(--clr-danger)', borderRadius: '50%' }} />
-                                Disqualified: {disqualified} ({disqualifiedPct}%)
-                              </div>
-                            </div>
-                          </div>
-                          <span className="adb-chart-title">Team Status Breakdown</span>
-                        </>
-                      );
-                    })()}
-                  </div>
+              {/* Event Coordinators Card */}
+              <div className="adb-card adb-card-animate stagger-2">
+                <div className="adb-card-header">
+                  <h3 className="adb-card-title">
+                    <Users size={18} style={{ color: 'var(--clr-accent)' }} />
+                    Event Coordinators
+                  </h3>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="adb-col-right">
-            {/* About Event Metadata Card */}
-            <div className="adb-card adb-card-animate stagger-1">
-              <div className="adb-card-header">
-                <h3 className="adb-card-title">
-                  <Info size={18} style={{ color: 'var(--clr-accent)' }} />
-                  About Event Details
-                </h3>
-                <button className="adb-edit-btn" onClick={() => setActiveTab(1)}>
-                  <Sliders size={14} />
-                  Configure
-                </button>
-              </div>
-              <div className="adb-card-body" style={{ padding: '0.25rem 0' }}>
-                <div className="adb-meta-item">
-                  <span className="adb-meta-label">Status</span>
-                  <span className="adb-meta-value">
-                    {formData.isPublished ? (
-                      <span className="adb-badge success">Published</span>
-                    ) : (
-                      <span className="adb-badge warning">Draft</span>
-                    )}
-                  </span>
-                </div>
-                <div className="adb-meta-item">
-                  <span className="adb-meta-label">Category</span>
-                  <span className="adb-meta-value">
-                    <span className="adb-badge accent">{formData.category || 'None'}</span>
-                  </span>
-                </div>
-                <div className="adb-meta-item">
-                  <span className="adb-meta-label">Event Type</span>
-                  <span className="adb-meta-value" style={{ textTransform: 'capitalize' }}>
-                    {formData.eventType || 'micro'}
-                  </span>
-                </div>
-                <div className="adb-meta-item">
-                  <span className="adb-meta-label">Created By</span>
-                  <span className="adb-meta-value">
-                    {/* Profile avatar for creator */}
-                    {event?.createdBy?.profilePicture ? (
-                      <img
-                        src={event.createdBy.profilePicture}
-                        alt={event.createdBy.name}
-                        className="adb-creator-avatar"
-                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                      />
-                    ) : null}
-                    <span
-                      className="adb-creator-avatar adb-creator-initials"
-                      style={event?.createdBy?.profilePicture ? { display: 'none' } : {}}
-                    >
-                      {(event?.createdBy?.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                    </span>
-                    <span>{event?.createdBy?.name || 'Administrator'}</span>
-                  </span>
-                </div>
-                <div className="adb-meta-item">
-                  <span className="adb-meta-label">Event Date</span>
-                  <span className="adb-meta-value">
-                    {formData.date ? new Date(formData.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set'}
-                  </span>
-                </div>
-                {formData.location && (
-                  <div className="adb-meta-item">
-                    <span className="adb-meta-label">Location</span>
-                    <span className="adb-meta-value" style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={formData.location}>
-                      {formData.location}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Coordinator Chat Card */}
-            <div className="adb-card adb-card-animate stagger-2">
-              <div className="adb-card-header">
-                <h3 className="adb-card-title">
-                  <MessageSquare size={18} style={{ color: 'var(--clr-accent)' }} />
-                  Group Message
-                </h3>
-                <div className="adb-chat-online-badges">
-                  {(formData.coordinators || []).slice(0, 3).map((coord, i) => {
-                    const initials = coord.name ? coord.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'C';
-                    const bgColors = ['#eff6ff','#f5f3ff','#ecfdf5','#fffbeb'];
-                    const txtColors = ['#2563eb','#7c3aed','#059669','#d97706'];
-                    const ci = i % 4;
-                    return (
-                      <div
-                        key={i}
-                        className="adb-chat-header-avatar"
-                        style={{ background: bgColors[ci], color: txtColors[ci], marginLeft: i > 0 ? '-8px' : 0 }}
-                        title={coord.name}
-                      >
-                        {initials}
+                <div className="adb-card-body">
+                  <div className="adb-coordinators-list">
+                    {(!formData.coordinators || formData.coordinators.length === 0) ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', background: 'var(--clr-surface-2)', borderRadius: '12px', border: '1px dashed var(--clr-border)', marginBottom: '1rem' }}>
+                        <div style={{ background: '#f8fafc', color: '#94a3b8', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                          <Users size={24} strokeWidth={1.5} />
+                        </div>
+                        <h4 style={{ margin: '0 0 6px', color: 'var(--clr-text-heading)', fontSize: '0.95rem', fontWeight: '600' }}>No Coordinators Assigned</h4>
+                        <p style={{ margin: '0', color: 'var(--clr-text-muted)', fontSize: '0.8125rem', textAlign: 'center', maxWidth: '80%' }}>Add team members to help you manage this event.</p>
                       </div>
-                    );
-                  })}
-                  {(formData.coordinators || []).length > 3 && (
-                    <div className="adb-chat-header-avatar" style={{ background: '#f1f5f9', color: '#64748b', marginLeft: '-8px', fontSize: '0.62rem' }}>
-                      +{(formData.coordinators || []).length - 3}
+                    ) : (
+                      (formData.coordinators || []).map((coord, idx) => {
+                        const initials = coord.name ? coord.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'C';
+                        const bgColors = ['#eff6ff', '#f5f3ff', '#fffbeb', '#ecfdf5'];
+                        const textColors = ['#2563eb', '#7c3aed', '#d97706', '#059669'];
+                        const colorIdx = idx % bgColors.length;
+
+                        return (
+                          <div className="adb-coordinator-card" key={idx}>
+                            <div className="adb-coordinator-info">
+                              <div
+                                className="adb-coordinator-avatar"
+                                style={{ backgroundColor: bgColors[colorIdx], color: textColors[colorIdx] }}
+                              >
+                                {initials}
+                              </div>
+                              <div className="adb-coordinator-details">
+                                <span className="adb-coordinator-name" title={coord.name}>{coord.name}</span>
+                                <span className="adb-coordinator-email" title={coord.email}>{coord.email}</span>
+                                <span className="adb-coordinator-role">{coord.role}</span>
+                              </div>
+                            </div>
+                            <button
+                              className="adb-coordinator-delete"
+                              onClick={() => handleRemoveCoordinator(idx)}
+                              title="Remove Coordinator"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  <button
+                    onClick={() => openAddCoordinatorModal()}
+                    style={{
+                      display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                      padding: '0.875rem', background: 'transparent', border: '1px dashed var(--clr-border)',
+                      borderRadius: '12px', color: 'var(--clr-text-heading)', fontWeight: '600',
+                      fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', marginTop: '1rem'
+                    }}
+                    onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--clr-text-muted)'; e.currentTarget.style.background = 'var(--clr-surface-2)'; }}
+                    onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--clr-border)'; e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Plus size={16} /> Add Coordinator
+                  </button>
+                </div>
+              </div>
+
+              {/* Progress Metrics Card */}
+              <div className="adb-card adb-card-animate stagger-3">
+                <div className="adb-card-header">
+                  <h3 className="adb-card-title">
+                    <Zap size={18} style={{ color: 'var(--clr-accent)' }} />
+                    Progress & Registration Metrics
+                  </h3>
+                  <button className="adb-edit-btn" onClick={() => setActiveTab(3)}>
+                    <Sliders size={14} />
+                    Limits Setup
+                  </button>
+                </div>
+                <div className="adb-card-body">
+                  <div className="adb-progress-layout">
+                    {/* Gauge 1: Registration Capacity */}
+                    <div className="adb-chart-container">
+                      {(() => {
+                        const limit = formData.maxShortlisted || 30;
+                        const count = registrations.length;
+                        const percentage = Math.min(100, limit > 0 ? Math.round((count / limit) * 100) : 0);
+                        const strokeDash = (percentage / 100) * 251.2;
+                        return (
+                          <>
+                            <svg width="120" height="120" viewBox="0 0 100 100">
+                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f1f5f9" strokeWidth="8" />
+                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--clr-accent)" strokeWidth="8"
+                                strokeDasharray="251.2" strokeDashoffset={251.2 - strokeDash} strokeLinecap="round"
+                                transform="rotate(-90 50 50)" className="adb-gauge-circle" />
+                              <text x="50" y="55" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#0f172a" fontFamily="var(--font-heading)">
+                                {percentage}%
+                              </text>
+                            </svg>
+                            <span className="adb-chart-title">Registration Capacity ({count}/{limit})</span>
+                          </>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Gauge 2: Verification Status */}
+                    <div className="adb-chart-container">
+                      {(() => {
+                        const shortlisted = registrations.filter(r => r.isShortlisted && !r.isDisqualified).length;
+                        const disqualified = registrations.filter(r => r.isDisqualified).length;
+                        const pending = registrations.filter(r => !r.isShortlisted && !r.isDisqualified).length;
+                        const total = registrations.length || 1;
+
+                        const shortlistedPct = Math.round((shortlisted / total) * 100);
+                        const disqualifiedPct = Math.round((disqualified / total) * 100);
+                        const pendingPct = Math.max(0, 100 - shortlistedPct - disqualifiedPct);
+
+                        return (
+                          <>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '240px', padding: '10px 0' }}>
+                              <div style={{ height: '12px', width: '100%', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
+                                <div className="adb-status-bar-fill" style={{ width: `${shortlistedPct}%`, background: 'var(--clr-success)', height: '100%', transition: 'width 0.9s ease' }} title={`Shortlisted: ${shortlistedPct}%`} />
+                                <div className="adb-status-bar-fill" style={{ width: `${pendingPct}%`, background: 'var(--clr-accent)', height: '100%', transition: 'width 0.9s ease' }} title={`Pending: ${pendingPct}%`} />
+                                <div className="adb-status-bar-fill" style={{ width: `${disqualifiedPct}%`, background: 'var(--clr-danger)', height: '100%', transition: 'width 0.9s ease' }} title={`Disqualified: ${disqualifiedPct}%`} />
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.75rem', color: 'var(--clr-text-muted)', width: '100%' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ width: '8px', height: '8px', background: 'var(--clr-success)', borderRadius: '50%' }} />
+                                  Shortlisted: {shortlisted} ({shortlistedPct}%)
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ width: '8px', height: '8px', background: 'var(--clr-accent)', borderRadius: '50%' }} />
+                                  Pending: {pending} ({pendingPct}%)
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ width: '8px', height: '8px', background: 'var(--clr-danger)', borderRadius: '50%' }} />
+                                  Disqualified: {disqualified} ({disqualifiedPct}%)
+                                </div>
+                              </div>
+                            </div>
+                            <span className="adb-chart-title">Team Status Breakdown</span>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="adb-col-right">
+              {/* About Event Metadata Card */}
+              <div className="adb-card adb-card-animate stagger-1">
+                <div className="adb-card-header">
+                  <h3 className="adb-card-title">
+                    <Info size={18} style={{ color: 'var(--clr-accent)' }} />
+                    About Event Details
+                  </h3>
+                  <button className="adb-edit-btn" onClick={() => setActiveTab(1)}>
+                    <Sliders size={14} />
+                    Configure
+                  </button>
+                </div>
+                <div className="adb-card-body" style={{ padding: '0.25rem 0' }}>
+                  <div className="adb-meta-item">
+                    <span className="adb-meta-label">Status</span>
+                    <span className="adb-meta-value">
+                      {formData.isPublished ? (
+                        <span className="adb-badge success">Published</span>
+                      ) : (
+                        <span className="adb-badge warning">Draft</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="adb-meta-item">
+                    <span className="adb-meta-label">Category</span>
+                    <span className="adb-meta-value">
+                      <span className="adb-badge accent">{formData.category || 'None'}</span>
+                    </span>
+                  </div>
+                  <div className="adb-meta-item">
+                    <span className="adb-meta-label">Event Type</span>
+                    <span className="adb-meta-value" style={{ textTransform: 'capitalize' }}>
+                      {formData.eventType || 'micro'}
+                    </span>
+                  </div>
+                  <div className="adb-meta-item">
+                    <span className="adb-meta-label">Created By</span>
+                    <span className="adb-meta-value">
+                      {/* Profile avatar for creator */}
+                      {event?.createdBy?.profilePicture ? (
+                        <img
+                          src={event.createdBy.profilePicture}
+                          alt={event.createdBy.name}
+                          className="adb-creator-avatar"
+                          onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                        />
+                      ) : null}
+                      <span
+                        className="adb-creator-avatar adb-creator-initials"
+                        style={event?.createdBy?.profilePicture ? { display: 'none' } : {}}
+                      >
+                        {(event?.createdBy?.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                      </span>
+                      <span>{event?.createdBy?.name || 'Administrator'}</span>
+                    </span>
+                  </div>
+                  <div className="adb-meta-item">
+                    <span className="adb-meta-label">Event Date</span>
+                    <span className="adb-meta-value">
+                      {formData.date ? new Date(formData.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set'}
+                    </span>
+                  </div>
+                  {formData.location && (
+                    <div className="adb-meta-item">
+                      <span className="adb-meta-label">Location</span>
+                      <span className="adb-meta-value" style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={formData.location}>
+                        {formData.location}
+                      </span>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="adb-card-body">
-                <div className="adb-chat-window">
-                  <div className="adb-chat-messages">
-                    {chatMessages.map((msg, idx) => {
-                      const avatarInitials = msg.avatar || (msg.sender || 'U').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+
+              {/* Coordinator Chat Card */}
+              <div className="adb-card adb-card-animate stagger-2">
+                <div className="adb-card-header">
+                  <h3 className="adb-card-title">
+                    <MessageSquare size={18} style={{ color: 'var(--clr-accent)' }} />
+                    Group Message
+                  </h3>
+                  <div className="adb-chat-online-badges">
+                    {(formData.coordinators || []).slice(0, 3).map((coord, i) => {
+                      const initials = coord.name ? coord.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'C';
+                      const bgColors = ['#eff6ff', '#f5f3ff', '#ecfdf5', '#fffbeb'];
+                      const txtColors = ['#2563eb', '#7c3aed', '#059669', '#d97706'];
+                      const ci = i % 4;
                       return (
-                        <div className={`adb-chat-bubble-container ${msg.self ? 'self' : ''}`} key={idx}>
-                          {/* Avatar — profile photo or initials */}
-                          {!msg.self && (
-                            <div className="adb-chat-avatar" title={msg.sender}>
-                              {msg.profilePicture ? (
-                                <img
-                                  src={msg.profilePicture}
-                                  alt={msg.sender}
-                                  className="adb-chat-avatar-img"
-                                  onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                />
-                              ) : null}
-                              <span
-                                className="adb-chat-avatar-fallback"
-                                style={msg.profilePicture ? { display: 'none' } : {}}
-                              >
-                                {avatarInitials}
-                              </span>
-                            </div>
-                          )}
-                          <div className="adb-chat-bubble">
-                            {!msg.self && <span className="adb-chat-sender">{msg.sender}</span>}
-                            <span className="adb-chat-text">{msg.text}</span>
-                            <div className="adb-chat-footer">
-                              <span className="adb-chat-time">{msg.time}</span>
-                              <div className="adb-chat-reactions">
-                                <button
-                                  className={`adb-chat-reaction-btn ${msg.reacted ? 'reacted' : ''}`}
-                                  onClick={() => handleReactToMessage(idx)}
-                                >
-                                  <span>❤️</span>
-                                  {msg.reactions > 0 && <span>{msg.reactions}</span>}
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Self avatar */}
-                          {msg.self && (
-                            <div className="adb-chat-avatar adb-chat-avatar-self" title={msg.sender}>
-                              {msg.profilePicture ? (
-                                <img
-                                  src={msg.profilePicture}
-                                  alt={msg.sender}
-                                  className="adb-chat-avatar-img"
-                                  onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                />
-                              ) : null}
-                              <span
-                                className="adb-chat-avatar-fallback"
-                                style={msg.profilePicture ? { display: 'none' } : {}}
-                              >
-                                {avatarInitials}
-                              </span>
-                            </div>
-                          )}
+                        <div
+                          key={i}
+                          className="adb-chat-header-avatar"
+                          style={{ background: bgColors[ci], color: txtColors[ci], marginLeft: i > 0 ? '-8px' : 0 }}
+                          title={coord.name}
+                        >
+                          {initials}
                         </div>
                       );
                     })}
-                    <div ref={chatEndRef} />
+                    {(formData.coordinators || []).length > 3 && (
+                      <div className="adb-chat-header-avatar" style={{ background: '#f1f5f9', color: '#64748b', marginLeft: '-8px', fontSize: '0.62rem' }}>
+                        +{(formData.coordinators || []).length - 3}
+                      </div>
+                    )}
                   </div>
+                </div>
+                <div className="adb-card-body">
+                  <div className="adb-chat-window">
+                    <div className="adb-chat-messages">
+                      {chatMessages.map((msg, idx) => {
+                        const avatarInitials = msg.avatar || (msg.sender || 'U').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        return (
+                          <div className={`adb-chat-bubble-container ${msg.self ? 'self' : ''}`} key={idx}>
+                            {/* Avatar — profile photo or initials */}
+                            {!msg.self && (
+                              <div className="adb-chat-avatar" title={msg.sender}>
+                                {msg.profilePicture ? (
+                                  <img
+                                    src={msg.profilePicture}
+                                    alt={msg.sender}
+                                    className="adb-chat-avatar-img"
+                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                  />
+                                ) : null}
+                                <span
+                                  className="adb-chat-avatar-fallback"
+                                  style={msg.profilePicture ? { display: 'none' } : {}}
+                                >
+                                  {avatarInitials}
+                                </span>
+                              </div>
+                            )}
+                            <div className="adb-chat-bubble">
+                              {!msg.self && <span className="adb-chat-sender">{msg.sender}</span>}
+                              <span className="adb-chat-text">{msg.text}</span>
+                              <div className="adb-chat-footer">
+                                <span className="adb-chat-time">{msg.time}</span>
+                                <div className="adb-chat-reactions">
+                                  <button
+                                    className={`adb-chat-reaction-btn ${msg.reacted ? 'reacted' : ''}`}
+                                    onClick={() => handleReactToMessage(idx)}
+                                  >
+                                    <span>❤️</span>
+                                    {msg.reactions > 0 && <span>{msg.reactions}</span>}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Self avatar */}
+                            {msg.self && (
+                              <div className="adb-chat-avatar adb-chat-avatar-self" title={msg.sender}>
+                                {msg.profilePicture ? (
+                                  <img
+                                    src={msg.profilePicture}
+                                    alt={msg.sender}
+                                    className="adb-chat-avatar-img"
+                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                  />
+                                ) : null}
+                                <span
+                                  className="adb-chat-avatar-fallback"
+                                  style={msg.profilePicture ? { display: 'none' } : {}}
+                                >
+                                  {avatarInitials}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      <div ref={chatEndRef} />
+                    </div>
 
-                  {/* Chat Input Form */}
-                  <form onSubmit={(e) => { e.preventDefault(); handleSendChatMessage(); }} className="adb-chat-input-area">
-                    <input
-                      type="text"
-                      className="adb-chat-input"
-                      placeholder="Type a message..."
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                    />
-                    <button type="submit" className="adb-chat-send-btn">
-                      <Send size={14} />
-                    </button>
-                  </form>
+                    {/* Chat Input Form */}
+                    <form onSubmit={(e) => { e.preventDefault(); handleSendChatMessage(); }} className="adb-chat-input-area">
+                      <input
+                        type="text"
+                        className="adb-chat-input"
+                        placeholder="Type a message..."
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                      />
+                      <button type="submit" className="adb-chat-send-btn">
+                        <Send size={14} />
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      ) : activeTab === 'feedback' ? (
+        <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 0' }}>
+          {/* Feedback Control Panel Header */}
+          <div className="adb-col-left" style={{ margin: '0 0 1.5rem 0' }}>
+            <div className="adb-card animate-fade-in" style={{ padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setActiveTab('dashboard')}
+                    style={{ marginRight: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    ← Back
+                  </button>
+                  <div>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Feedback Control Panel</h2>
+                    <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '2px 0 0 0' }}>Configure feedback availability and manage student submissions for this event.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '8px 16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: event?.isFeedbackOpen !== false ? '#059669' : '#64748b' }}>
+                    {event?.isFeedbackOpen !== false ? 'Active' : 'Suspended'}
+                  </span>
+                  <label className={`ae-toggle-item ${event?.isFeedbackOpen !== false ? 'active' : ''}`} style={{ margin: 0, padding: 0, border: 'none', background: 'transparent' }}>
+                    <div className="ae-toggle-switch">
+                      <input
+                        type="checkbox"
+                        checked={event?.isFeedbackOpen !== false}
+                        onChange={() => toggleFeedbackStatus()}
+                        style={{ display: 'none' }}
+                      />
+                      <div className="ae-switch-track" style={{ width: '44px', height: '24px', position: 'relative', cursor: 'pointer', borderRadius: '12px', background: event?.isFeedbackOpen !== false ? '#ec4899' : '#cbd5e1' }}>
+                        <div className="ae-switch-thumb" style={{ width: '18px', height: '18px', position: 'absolute', top: '3px', left: event?.isFeedbackOpen !== false ? '23px' : '3px', borderRadius: '50%', background: '#fff', transition: 'all 0.2s' }} />
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+            <div className="adb-card" style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Users size={22} />
+              </div>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Submissions</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>{feedbacks.length}</span>
+              </div>
+            </div>
+
+            <div className="adb-card" style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Award size={22} />
+              </div>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Avg Event Rating</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>
+                  {feedbacks.length > 0
+                    ? `${(feedbacks.reduce((a, b) => a + (b.eventRating || 0), 0) / feedbacks.length).toFixed(1)} / 5.0`
+                    : 'N/A'}
+                </span>
+              </div>
+            </div>
+
+            <div className="adb-card" style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle2 size={22} />
+              </div>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Satisfaction Rate</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>
+                  {feedbacks.length > 0
+                    ? `${Math.round((feedbacks.filter(f => f.overallSatisfaction >= 4).length / feedbacks.length) * 100)}%`
+                    : 'N/A'}
+                </span>
+              </div>
+            </div>
+
+            <div className="adb-card" style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MessageSquare size={22} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Template Mapped</span>
+                <span style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={allEvents.find(e => e._id === (event?._id || id))?.feedbackTemplate?.title || 'Default General Feedback Form'}>
+                  {allEvents.find(e => e._id === (event?._id || id))?.feedbackTemplate?.title || 'Default General Form'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Feedbacks Log */}
+          <div className="adb-card animate-fade-in" style={{ padding: '1.5rem', borderRadius: '20px', border: '1px solid var(--clr-border)', background: 'var(--clr-surface)', minHeight: '300px' }}>
+            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '1.1rem', color: '#0f172a', fontWeight: '750' }}>
+              Submissions Log ({feedbacks.length})
+            </h3>
+            {feedbacks.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', padding: '4rem 0', color: '#94a3b8' }}>
+                <MessageSquare size={40} style={{ opacity: 0.4 }} />
+                <span>No feedback responses received for this event yet.</span>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table className="table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#334155', fontWeight: '700', textAlign: 'left' }}>
+                      <th style={{ padding: '12px 16px' }}>Participant</th>
+                      <th style={{ padding: '12px 16px' }}>Event Rating</th>
+                      <th style={{ padding: '12px 16px' }}>Comments / Suggestions</th>
+                      <th style={{ padding: '12px 16px' }}>Custom Answers</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feedbacks.map((f) => (
+                      <tr key={f._id} style={{ borderBottom: '1px solid #e2e8f0', color: '#1e293b' }}>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ fontWeight: '700', color: '#0f172a', display: 'block' }}>{f.user?.name || 'Anonymous Student'}</span>
+                          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                            {f.user?.registerNumber || f.user?.email || 'N/A'} • {f.user?.department || ''}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ fontWeight: '700', color: '#ec4899', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            ⭐ {f.eventRating || 5}/5
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px', maxWidth: '350px' }}>
+                          {f.eventComments && <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: '#475569' }}><strong>Feedback:</strong> {f.eventComments}</p>}
+                          {f.suggestions && <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}><strong>Suggestions:</strong> {f.suggestions}</p>}
+                          {!f.eventComments && !f.suggestions && <span style={{ color: '#cbd5e1', fontStyle: 'italic' }}>None</span>}
+                        </td>
+                        <td style={{ padding: '12px 16px' }}>
+                          {f.templateAnswers && Object.keys(f.templateAnswers).length > 0 ? (
+                            <details style={{ cursor: 'pointer', outline: 'none' }}>
+                              <summary style={{ fontSize: '0.78rem', color: '#6366f1', fontWeight: '600' }}>
+                                View {Object.keys(f.templateAnswers).length} Answer(s)
+                              </summary>
+                              <div style={{ marginTop: '8px', padding: '8px', background: '#f8fafc', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.78rem', border: '1px solid #e2e8f0', minWidth: '200px' }}>
+                                {Object.entries(f.templateAnswers).map(([qId, val]) => {
+                                  const fieldDef = f.template?.fields?.find(field => field.id === qId);
+                                  const label = fieldDef?.label || qId;
+                                  let valStr = '';
+                                  if (typeof val === 'object' && val !== null) {
+                                    valStr = JSON.stringify(val);
+                                  } else {
+                                    valStr = String(val);
+                                  }
+                                  return (
+                                    <div key={qId} style={{ borderBottom: '1px dotted #cbd5e1', paddingBottom: '4px' }}>
+                                      <strong style={{ color: '#334155' }}>{label}:</strong>{' '}
+                                      <span style={{ color: '#0f172a' }}>{valStr}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </details>
+                          ) : (
+                            <span style={{ color: '#cbd5e1', fontStyle: 'italic' }}>None</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: '#ef4444', padding: '4px' }}
+                            title="Delete Feedback"
+                            onClick={() => handleDeleteFeedback(f._id)}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : activeTab === 'report' ? (
+        <div className="animate-fade-in" style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem 0' }}>
+          {/* Header with back button */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setActiveTab('dashboard')}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              ← Back
+            </button>
+            <div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Generate Event Report</h2>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '2px 0 0 0' }}>Compile logistics, feedback logs, event summary, and photos into an official print-ready PDF document.</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(350px, 420px) 1fr', gap: '1.5rem', alignItems: 'start' }}>
+            {/* COLUMN 1: CONFIGURATION PANEL */}
+            <div className="adb-card" style={{ padding: '1.25rem', borderRadius: '18px', background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--clr-accent)', borderBottom: '1px solid var(--clr-border)', paddingBottom: '8px', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Report Configuration
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {/* Event Logistics */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>Logistics & Details</h4>
+                  
+                  <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                    <label className="form-label">Co-ordinator Name</label>
+                    <input type="text" className="form-input" value={reportConfig.coordinatorName} onChange={(e) => setReportConfig({ ...reportConfig, coordinatorName: e.target.value })} />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                    <label className="form-label">Participants Group (Branch/Year)</label>
+                    <input type="text" className="form-input" value={reportConfig.participantsClass} onChange={(e) => setReportConfig({ ...reportConfig, participantsClass: e.target.value })} />
+                  </div>
+
+                  <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Participants Count</label>
+                      <input type="text" className="form-input" value={reportConfig.participantCount} onChange={(e) => setReportConfig({ ...reportConfig, participantCount: e.target.value })} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Venue / Location</label>
+                      <input type="text" className="form-input" value={reportConfig.venueName} onChange={(e) => setReportConfig({ ...reportConfig, venueName: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Association with IIC</label>
+                      <Select className="form-select" value={reportConfig.assocIIC} onChange={(e) => setReportConfig({ ...reportConfig, assocIIC: e.target.value })}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Feedback Intake (Yes/No)</label>
+                      <Select className="form-select" value={reportConfig.feedbackActive} onChange={(e) => setReportConfig({ ...reportConfig, feedbackActive: e.target.value })}>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Executive Summary */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>Executive Summary</h4>
+                  <div className="form-group">
+                    <label className="form-label">Paragraph Text</label>
+                    <textarea rows="4" className="form-input" value={reportConfig.execSummary} onChange={(e) => setReportConfig({ ...reportConfig, execSummary: e.target.value })} style={{ resize: 'vertical', fontSize: '0.78rem' }} />
+                  </div>
+                </div>
+
+                {/* Highlights list */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.82rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>Key Takeaways / Highlights</h4>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-xs text-accent"
+                      onClick={() => setReportConfig({
+                        ...reportConfig,
+                        highlights: [...reportConfig.highlights, 'New session highlight point.']
+                      })}
+                    >
+                      + Add Point
+                    </button>
+                  </div>
+                  {reportConfig.highlights.map((point, index) => (
+                    <div key={index} style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={point}
+                        style={{ fontSize: '0.75rem', padding: '6px 8px' }}
+                        onChange={(e) => {
+                          const updated = [...reportConfig.highlights];
+                          updated[index] = e.target.value;
+                          setReportConfig({ ...reportConfig, highlights: updated });
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs text-danger"
+                        style={{ padding: '4px' }}
+                        onClick={() => setReportConfig({
+                          ...reportConfig,
+                          highlights: reportConfig.highlights.filter((_, idx) => idx !== index)
+                        })}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Event Photo Uploads */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>Event Action Photos (2 Max)</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.7rem' }}>Photo 1 File</label>
+                      <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 1)} style={{ fontSize: '0.7rem', width: '100%' }} />
+                      {reportConfig.photo1 && <img src={reportConfig.photo1} alt="Preview 1" style={{ width: '100%', height: '50px', objectFit: 'cover', borderRadius: '4px', marginTop: '4px' }} />}
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.7rem' }}>Photo 2 File</label>
+                      <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 2)} style={{ fontSize: '0.7rem', width: '100%' }} />
+                      {reportConfig.photo2 && <img src={reportConfig.photo2} alt="Preview 2" style={{ width: '100%', height: '50px', objectFit: 'cover', borderRadius: '4px', marginTop: '4px' }} />}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signature Authorities */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: 'var(--clr-text-muted)', textTransform: 'uppercase' }}>Signatures Alignment</h4>
+                  
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label">President Name</label>
+                    <input type="text" className="form-input" style={{ fontSize: '0.75rem', padding: '6px 8px' }} value={reportConfig.presidentName} onChange={(e) => setReportConfig({ ...reportConfig, presidentName: e.target.value })} />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label">Secretary Name</label>
+                    <input type="text" className="form-input" style={{ fontSize: '0.75rem', padding: '6px 8px' }} value={reportConfig.secretaryName} onChange={(e) => setReportConfig({ ...reportConfig, secretaryName: e.target.value })} />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label">Faculty Incharge</label>
+                    <input type="text" className="form-input" style={{ fontSize: '0.75rem', padding: '6px 8px' }} value={reportConfig.facultyIncharge} onChange={(e) => setReportConfig({ ...reportConfig, facultyIncharge: e.target.value })} />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label">Programme Coordinator</label>
+                    <input type="text" className="form-input" style={{ fontSize: '0.75rem', padding: '6px 8px' }} value={reportConfig.progCoordinator} onChange={(e) => setReportConfig({ ...reportConfig, progCoordinator: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">HoD Name</label>
+                    <input type="text" className="form-input" style={{ fontSize: '0.75rem', padding: '6px 8px' }} value={reportConfig.hodName} onChange={(e) => setReportConfig({ ...reportConfig, hodName: e.target.value })} />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* COLUMN 2: REAL-TIME A4 PREVIEW & PRINT TRIGGER */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Live Document Mockup (A4 Ratio)</span>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ background: 'var(--clr-accent)', borderColor: 'var(--clr-accent)', fontWeight: 'bold', display: 'inline-flex', gap: '8px', alignItems: 'center' }}
+                  onClick={() => {
+                    const printWindow = window.open('', '_blank');
+                    const formatDate = (dateVal) => {
+                      if (!dateVal) return '';
+                      try {
+                        const d = new Date(dateVal);
+                        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                      } catch {
+                        return dateVal;
+                      }
+                    };
+
+                    const formattedDate = formatDate(formData.date);
+                    
+                    // Create formatted feedbacks rows
+                    const feedbacksRows = feedbacks.map((f, i) => `
+                      <tr style="page-break-inside: avoid;">
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt;">${i + 1}</td>
+                        <td style="border: 1px solid #000; padding: 6px; font-size: 9pt;">${f.studentName || f.user?.name || 'Anonymous Student'}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt;">${f.registerNumber || f.user?.registerNumber || 'N/A'}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt;">${f.eventRating || 5}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt;">${f.usefulnessRating || f.platformRating || f.siteRating || 5}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt;">${f.user?.department || 'ECE'}</td>
+                        <td style="border: 1px solid #000; padding: 6px; font-size: 9pt;">${f.suggestions || f.eventComments || 'No suggestions'}</td>
+                      </tr>
+                    `).join('');
+
+                    const execSummaryBullets = reportConfig.highlights.map(p => `<li style="margin-bottom: 8px;">${p}</li>`).join('');
+
+                    // MCET Header Logos
+                    // We render custom SVG graphics which match the headers exactly!
+                    const mcetLogoSvg = `
+                      <svg width="40" height="40" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" stroke="#1e3a8a" stroke-width="4" fill="none" />
+                        <circle cx="50" cy="50" r="37" fill="#b91c1c" />
+                        <text x="50" y="55" fill="#fff" font-size="16" font-family="sans-serif" font-weight="900" text-anchor="middle">MOET</text>
+                      </svg>
+                    `;
+
+                    const spectrumLogoSvg = `
+                      <div style="width: 55px; height: 55px; background: #000; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <svg width="35" height="35" viewBox="0 0 100 100">
+                          <defs>
+                            <linearGradient id="print-spec" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#3b82f6" />
+                              <stop offset="50%" stop-color="#ec4899" />
+                              <stop offset="100%" stop-color="#eab308" />
+                            </linearGradient>
+                          </defs>
+                          <polygon points="50,15 15,80 85,80" stroke="url(#print-spec)" stroke-width="8" fill="none" />
+                        </svg>
+                        <div style="font-size: 5px; font-weight: bold; color: #fff; font-family: sans-serif; text-transform: uppercase; margin-top: 1px;">SPECTRUM</div>
+                      </div>
+                    `;
+
+                    const founderPhotoSvg = `
+                      <div style="width: 50px; height: 50px; background: #eaeaea; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #bbb;">
+                        <svg width="30" height="30" viewBox="0 0 100 100">
+                          <circle cx="50" cy="40" r="22" fill="#777" />
+                          <path d="M20,80 C20,60 80,60 80,80 Z" fill="#777" />
+                        </svg>
+                      </div>
+                    `;
+
+                    printWindow.document.write(`
+                      <html>
+                        <head>
+                          <title>Report - ${formData.title || 'Event'}</title>
+                          <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+                            @page {
+                              size: A4;
+                              margin: 0;
+                            }
+                            body {
+                              font-family: 'Inter', sans-serif;
+                              color: #000;
+                              background: #fff;
+                              margin: 0;
+                              padding: 0;
+                              line-height: 1.4;
+                            }
+                            .page {
+                              width: 210mm;
+                              height: 297mm;
+                              padding: 18mm 15mm;
+                              box-sizing: border-box;
+                              page-break-after: always;
+                              position: relative;
+                              background: #fff;
+                            }
+                            .header-table {
+                              width: 100%;
+                              border-collapse: collapse;
+                              margin-bottom: 5px;
+                            }
+                            .logo-cell {
+                              width: 60px;
+                              vertical-align: middle;
+                              text-align: center;
+                            }
+                            .title-cell {
+                              text-align: center;
+                              vertical-align: middle;
+                            }
+                            .title-cell h1 {
+                              font-size: 14.5pt;
+                              font-weight: 800;
+                              margin: 0;
+                              color: #000;
+                              letter-spacing: 0.5px;
+                              font-family: Arial, Helvetica, sans-serif;
+                            }
+                            .title-cell p {
+                              font-size: 8.5pt;
+                              margin: 2px 0;
+                              font-weight: 500;
+                            }
+                            .auto-banner {
+                              display: inline-block;
+                              border: 1px solid #000;
+                              padding: 1px 12px;
+                              font-size: 8.5pt;
+                              font-weight: bold;
+                              margin-top: 4px;
+                              border-radius: 2px;
+                            }
+                            .dept-title {
+                              text-align: center;
+                              margin: 10px 0 15px 0;
+                              border-top: 1.5px solid #000;
+                              border-bottom: 1.5px solid #000;
+                              padding: 6px 0;
+                            }
+                            .dept-name {
+                              font-size: 11.5pt;
+                              font-weight: bold;
+                              color: #1e3a8a;
+                              text-transform: uppercase;
+                              margin: 0;
+                              letter-spacing: 0.5px;
+                            }
+                            .assoc-name {
+                              font-size: 11pt;
+                              font-weight: bold;
+                              margin: 2px 0 0 0;
+                            }
+                            .details-table {
+                              width: 100%;
+                              border-collapse: collapse;
+                              margin-bottom: 20px;
+                            }
+                            .details-table td {
+                              padding: 5px 0;
+                              font-size: 10pt;
+                              vertical-align: top;
+                            }
+                            .details-table td.label-col {
+                              font-weight: bold;
+                              width: 170px;
+                            }
+                            .details-table td.sep-col {
+                              width: 15px;
+                              text-align: center;
+                            }
+                            .summary-head {
+                              font-size: 10.5pt;
+                              font-weight: bold;
+                              text-decoration: underline;
+                              margin-bottom: 10px;
+                              font-family: Arial, Helvetica, sans-serif;
+                            }
+                            .summary-p {
+                              font-size: 9.5pt;
+                              text-align: justify;
+                              margin-bottom: 15px;
+                              text-justify: inter-word;
+                            }
+                            .bullet-list {
+                              font-size: 9.5pt;
+                              padding-left: 18px;
+                            }
+                            .bullet-list li {
+                              margin-bottom: 8px;
+                              text-align: justify;
+                            }
+                            .section-heading-print {
+                              font-size: 11pt;
+                              font-weight: bold;
+                              text-decoration: underline;
+                              margin: 0 0 15px 0;
+                              font-family: Arial, Helvetica, sans-serif;
+                              text-transform: uppercase;
+                            }
+                            /* Table Style Feedback */
+                            .feedback-table-print {
+                              width: 100%;
+                              border-collapse: collapse;
+                              margin-top: 10px;
+                            }
+                            .feedback-table-print th {
+                              border: 1px solid #000;
+                              padding: 6px;
+                              font-size: 9.5pt;
+                              font-weight: bold;
+                              background: #f3f4f6;
+                              text-align: center;
+                            }
+                            /* Signature Layout */
+                            .sig-row-1 {
+                              display: flex;
+                              justify-content: space-between;
+                              margin-top: 80px;
+                              padding: 0 10px;
+                            }
+                            .sig-row-2 {
+                              display: flex;
+                              justify-content: space-between;
+                              margin-top: 80px;
+                              padding: 0 10px;
+                            }
+                            .sig-block {
+                              text-align: center;
+                              width: 200px;
+                            }
+                            .sig-title {
+                              font-weight: bold;
+                              font-size: 9.5pt;
+                              margin-bottom: 2px;
+                            }
+                            .sig-name {
+                              font-size: 9.5pt;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          <!-- PAGE 1: DETAILS & EXEC SUMMARY -->
+                          <div class="page">
+                            <table class="header-table">
+                              <tr>
+                                <td class="logo-cell" style="text-align: left; width: 70px;">
+                                  ${founderPhotoSvg}
+                                  <div style="font-size: 6px; font-weight: bold; margin-top: 3px; font-family: sans-serif; text-align: center;">Arutchelvar<br/>Dr. N. Mahalingam</div>
+                                </td>
+                                <td class="title-cell">
+                                  <h1>Dr. MAHALINGAM COLLEGE OF ENGINEERING AND TECHNOLOGY</h1>
+                                  <p style="font-size: 7.5pt; color: #555;">Udumalai Road, Pollachi, Coimbatore District 642003</p>
+                                  <span class="auto-banner">An Autonomous Institution Since 2011</span>
+                                </td>
+                                <td class="logo-cell" style="text-align: right; width: 130px; display: inline-flex; gap: 8px; justify-content: flex-end; border: none; padding-top: 10px;">
+                                  <div style="border: 1px solid #000; padding: 2px 4px; border-radius: 2px; text-align: center; background: #fff; font-size: 8px; font-family: sans-serif; height: 35px; width: 45px;">
+                                    <div style="font-weight: 800; color: #b91c1c;">NAAC</div>
+                                    <div style="font-size: 6px; color: #1e3a8a;">A++ GRADE</div>
+                                  </div>
+                                  ${spectrumLogoSvg}
+                                </td>
+                              </tr>
+                            </table>
+
+                            <div class="dept-title">
+                              <h2 class="dept-name">Department of Electronics and Communication Engineering</h2>
+                              <h3 class="dept-name" style="color: #000; font-size: 10.5pt; margin-top: 3px;">Department Association – SPECTRUM</h2>
+                            </div>
+
+                            <table class="details-table">
+                              <tr>
+                                <td class="label-col">Title of the Event</td>
+                                <td class="sep-col">:</td>
+                                <td>${formData.title || 'Career Connect'}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Date & Time</td>
+                                <td class="sep-col">:</td>
+                                <td>${formattedDate} & ${formData.session === 'none' ? '11:00 am - 1:00 pm' : formData.session}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Name of the Co-ordinator</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.coordinatorName}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Participants</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.participantsClass}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Number of Participants</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.participantCount}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Venue</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.venueName}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Association with IIC</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.assocIIC}</td>
+                              </tr>
+                              <tr>
+                                <td class="label-col">Feedback (Yes/No)</td>
+                                <td class="sep-col">:</td>
+                                <td>${reportConfig.feedbackActive}</td>
+                              </tr>
+                            </table>
+
+                            <div class="summary-head">Executive Summary:</div>
+                            <p class="summary-p">
+                              ${reportConfig.execSummary}
+                            </p>
+                            
+                            <ul class="bullet-list">
+                              ${execSummaryBullets}
+                            </ul>
+                            
+                            <p class="summary-p" style="margin-top: 15px;">
+                              The ${formData.title || 'Career Connect'} program successfully prepared ECE & ACT students to focus on skill development and career readiness for their future professional journey.
+                            </p>
+                          </div>
+
+                          <!-- PAGE 2: POSTER -->
+                          <div class="page">
+                            <div class="section-heading-print">Poster:</div>
+                            <div style="width: 100%; height: 230mm; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; overflow: hidden; border-radius: 8px;">
+                              <img src="${formData.imageUrl || 'https://via.placeholder.com/800x1100.png?text=Event+Poster+Not+Found'}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                            </div>
+                          </div>
+
+                          <!-- PAGE 3: PHOTOS -->
+                          <div class="page">
+                            <div class="section-heading-print">Event Photos:</div>
+                            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; height: 230mm;">
+                              <div style="width: 95%; height: 105mm; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 6px; background: rgba(0,0,0,0.02);">
+                                ${reportConfig.photo1 ? `<img src="${reportConfig.photo1}" style="width: 100%; height: 100%; object-fit: cover;" />` : `<span style="color:#aaa; font-size:10pt;">Photo 1 Not Uploaded (Select Photo 1 in report panel)</span>`}
+                              </div>
+                              <div style="width: 95%; height: 105mm; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 6px; background: rgba(0,0,0,0.02);">
+                                ${reportConfig.photo2 ? `<img src="${reportConfig.photo2}" style="width: 100%; height: 100%; object-fit: cover;" />` : `<span style="color:#aaa; font-size:10pt;">Photo 2 Not Uploaded (Select Photo 2 in report panel)</span>`}
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- PAGE 4: FEEDBACK -->
+                          <div class="page">
+                            <div class="section-heading-print">Feedback:</div>
+                            <table class="feedback-table-print">
+                              <thead>
+                                <tr>
+                                  <th style="width: 40px;">S.No</th>
+                                  <th>Name</th>
+                                  <th style="width: 100px;">Register Number</th>
+                                  <th style="width: 80px;">Event Rating</th>
+                                  <th style="width: 80px;">Usefulness Rating</th>
+                                  <th style="width: 110px;">Preferred Domain</th>
+                                  <th>Suggestions / Improvements</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                ${feedbacksRows || '<tr><td colspan="7" style="border: 1px solid #000; padding: 12px; text-align: center; color: #777;">No active feedback submissions recorded for this event.</td></tr>'}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- PAGE 5: SIGNATURES -->
+                          <div class="page" style="display: flex; flex-direction: column; justify-content: center; height: 297mm; box-sizing: border-box; padding: 25mm;">
+                            <div style="border: 2px dashed rgba(0,0,0,0.05); padding: 40px; border-radius: 12px;">
+                              <div class="sig-row-1">
+                                <div class="sig-block">
+                                  <div class="sig-title">President &ndash; SPECTRUM</div>
+                                  <div class="sig-name">${reportConfig.presidentName}</div>
+                                </div>
+                                <div class="sig-block">
+                                  <div class="sig-title">Secretary &ndash; SPECTRUM</div>
+                                  <div class="sig-name">${reportConfig.secretaryName}</div>
+                                </div>
+                              </div>
+
+                              <div class="sig-row-2" style="margin-top: 130px;">
+                                <div class="sig-block" style="text-align: left;">
+                                  <div class="sig-title">Faculty Incharge</div>
+                                  <div class="sig-name">${reportConfig.facultyIncharge}</div>
+                                </div>
+                                <div class="sig-block">
+                                  <div class="sig-title">Programme Coordinator</div>
+                                  <div class="sig-name">${reportConfig.progCoordinator}</div>
+                                </div>
+                                <div class="sig-block" style="text-align: right;">
+                                  <div class="sig-title">HoD/ECE</div>
+                                  <div class="sig-name">${reportConfig.hodName}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </body>
+                      </html>
+                    `);
+                    printWindow.document.close();
+                    setTimeout(() => {
+                      printWindow.focus();
+                      printWindow.print();
+                    }, 500);
+                  }}
+                >
+                  <Send size={15} /> Print / Save PDF
+                </button>
+              </div>
+
+              {/* LIVE PREVIEW SCREEN ACCORDION CONTAINER */}
+              <div style={{ background: '#fff', color: '#000', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', padding: '20px', minHeight: '600px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', fontFamily: 'Arial, sans-serif' }}>
+                 {/* Page 1 Mockup */}
+                 <div style={{ borderBottom: '1px dashed #cbd5e1', paddingBottom: '30px', marginBottom: '30px' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                     {/* Founder representation */}
+                     <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#f1f5f9', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '7px', fontWeight: 'bold', color: '#64748b' }}>Founder</div>
+                     {/* Center text */}
+                     <div style={{ textAlign: 'center', flex: 1, padding: '0 8px' }}>
+                       <h4 style={{ margin: 0, fontSize: '0.78rem', fontWeight: 800, color: '#1e3a8a' }}>Dr. MAHALINGAM COLLEGE OF ENGINEERING AND TECHNOLOGY</h4>
+                       <p style={{ margin: '2px 0 0 0', fontSize: '0.62rem', color: '#475569' }}>Pollachi, Coimbatore District</p>
+                       <span style={{ display: 'inline-block', border: '1px solid #111', fontSize: '0.62rem', padding: '0px 8px', fontWeight: 'bold', marginTop: '2px' }}>An Autonomous Institution Since 2011</span>
+                     </div>
+                     {/* Right logos */}
+                     <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                       <div style={{ border: '1px solid #111', width: '32px', textAlign: 'center', fontSize: '6px', padding: '2px' }}>
+                         <div style={{ fontWeight: 800, color: '#b91c1c' }}>NAAC</div>
+                         <div style={{ fontSize: '5px', color: '#1e3a8a' }}>A++</div>
+                       </div>
+                       <div style={{ width: '32px', height: '32px', background: '#000', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                         <div style={{ width: '16px', height: '16px', border: '2px solid #581c87', transform: 'rotate(45deg)' }} />
+                       </div>
+                     </div>
+                   </div>
+
+                   <div style={{ borderTop: '2px solid #111', borderBottom: '2px solid #111', padding: '6px 0', textAlign: 'center', margin: '14px 0' }}>
+                     <h5 style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#1e3a8a', textTransform: 'uppercase' }}>Department of Electronics and Communication Engineering</h5>
+                     <h6 style={{ margin: '1px 0 0 0', fontSize: '0.72rem', fontWeight: 700 }}>Department Association &ndash; SPECTRUM</h6>
+                   </div>
+
+                   <table style={{ width: '100%', fontSize: '0.72rem', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                     <tbody>
+                       {[
+                         { l: 'Title of the Event', v: formData.title || 'Career Connect' },
+                         { l: 'Date & Time', v: `${reportConfig.feedbackActive === 'Yes' ? '30/01/2026' : 'Date'} & ${formData.session === 'none' ? '11:00 am - 1:00 pm' : formData.session}` },
+                         { l: 'Name of the Co-ordinator', v: reportConfig.coordinatorName },
+                         { l: 'Participants', v: reportConfig.participantsClass },
+                         { l: 'Number of Participants', v: reportConfig.participantCount },
+                         { l: 'Venue', v: reportConfig.venueName },
+                         { l: 'Association with IIC', v: reportConfig.assocIIC },
+                         { l: 'Feedback (Yes/No)', v: reportConfig.feedbackActive }
+                       ].map((r, i) => (
+                         <tr key={i}>
+                           <td style={{ fontWeight: 'bold', width: '170px', padding: '3px 0' }}>{r.l}</td>
+                           <td style={{ width: '15px', textAlign: 'center' }}>:</td>
+                           <td style={{ color: '#334155' }}>{r.v}</td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+
+                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', textDecoration: 'underline', marginBottom: '6px' }}>Executive Summary:</div>
+                   <p style={{ fontSize: '0.7rem', color: '#1e293b', textAlign: 'justify', lineHeight: 1.4, margin: '0 0 10px 0' }}>{reportConfig.execSummary}</p>
+                   
+                   <ul style={{ fontSize: '0.7rem', color: '#1e293b', paddingLeft: '14px', margin: 0 }}>
+                     {reportConfig.highlights.map((h, i) => (
+                       <li key={i} style={{ marginBottom: '4px' }}>{h}</li>
+                     ))}
+                   </ul>
+                 </div>
+
+                 {/* Page 2 Mockup */}
+                 <div style={{ borderBottom: '1px dashed #cbd5e1', paddingBottom: '30px', marginBottom: '30px' }}>
+                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>Poster:</div>
+                   <div style={{ width: '100%', height: '240px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                     {formData.imageUrl ? <img src={formData.imageUrl} alt="Poster Print" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} /> : 'No Event Poster'}
+                   </div>
+                 </div>
+
+                 {/* Page 3 Mockup */}
+                 <div style={{ borderBottom: '1px dashed #cbd5e1', paddingBottom: '30px', marginBottom: '30px' }}>
+                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>Event Photos:</div>
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                     <div style={{ height: '140px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                       {reportConfig.photo1 ? <img src={reportConfig.photo1} alt="Action 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ color: '#94a3b8', fontSize: '9px' }}>Photo 1 empty</span>}
+                     </div>
+                     <div style={{ height: '140px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                       {reportConfig.photo2 ? <img src={reportConfig.photo2} alt="Action 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ color: '#94a3b8', fontSize: '9px' }}>Photo 2 empty</span>}
+                     </div>
+                   </div>
+                 </div>
+
+                 {/* Page 4 Mockup */}
+                 <div>
+                   <div style={{ fontSize: '0.75rem', fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>FEEDBACK Table Preview:</div>
+                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.62rem' }}>
+                     <thead>
+                       <tr style={{ background: '#f1f5f9' }}>
+                         <th style={{ border: '1px solid #e2e8f0', padding: '4px' }}>S.No</th>
+                         <th style={{ border: '1px solid #e2e8f0', padding: '4px', textAlign: 'left' }}>Name</th>
+                         <th style={{ border: '1px solid #e2e8f0', padding: '4px' }}>Register Number</th>
+                         <th style={{ border: '1px solid #e2e8f0', padding: '4px' }}>Event Rating</th>
+                         <th style={{ border: '1px solid #e2e8f0', padding: '4px', textAlign: 'left' }}>Suggestions</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {feedbacks.slice(0, 5).map((f, i) => (
+                         <tr key={i}>
+                           <td style={{ border: '1px solid #e2e8f0', padding: '4px', textAlign: 'center' }}>{i + 1}</td>
+                           <td style={{ border: '1px solid #e2e8f0', padding: '4px' }}>{f.studentName || f.user?.name || 'Anonymous Student'}</td>
+                           <td style={{ border: '1px solid #e2e8f0', padding: '4px', textAlign: 'center' }}>{f.registerNumber || f.user?.registerNumber || 'N/A'}</td>
+                           <td style={{ border: '1px solid #e2e8f0', padding: '4px', textAlign: 'center' }}>{f.eventRating || 5}</td>
+                           <td style={{ border: '1px solid #e2e8f0', padding: '4px' }}>{f.suggestions || f.eventComments || 'No suggestions'}</td>
+                         </tr>
+                       ))}
+                       {feedbacks.length > 5 && (
+                         <tr>
+                           <td colSpan="5" style={{ textAlign: 'center', padding: '6px', color: '#64748b' }}>
+                             And {feedbacks.length - 5} more feedback rows...
+                           </td>
+                         </tr>
+                       )}
+                       {feedbacks.length === 0 && (
+                         <tr>
+                           <td colSpan="5" style={{ textAlign: 'center', padding: '12px', color: '#94a3b8' }}>No submissions yet. Add feedbacks to preview.</td>
+                         </tr>
+                       )}
+                     </tbody>
+                   </table>
+                 </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="ae-wizard-container">
           {/* Card Panel Left */}
           <div className="ae-wizard-card">
-            
+
             {/* Step 1: General Info */}
             {activeTab === 1 && (
               <>
@@ -1868,21 +2894,21 @@ const AdminEventDetail = () => {
                       <div className="date-range-inputs" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
                           <small style={{ display: 'block', color: 'var(--clr-text-muted)', marginBottom: '4px' }}>Start Date</small>
-                          <input 
-                            type="date" 
-                            className="form-input" 
-                            value={formData.date || ''} 
-                            onChange={(e) => handleMacroDateRangeChange(e.target.value, formData.endDate)} 
+                          <input
+                            type="date"
+                            className="form-input"
+                            value={formData.date || ''}
+                            onChange={(e) => handleMacroDateRangeChange(e.target.value, formData.endDate)}
                           />
                         </div>
                         <span style={{ color: 'var(--clr-text-muted)', marginTop: '20px' }}>&rarr;</span>
                         <div style={{ flex: 1 }}>
                           <small style={{ display: 'block', color: 'var(--clr-text-muted)', marginBottom: '4px' }}>End Date</small>
-                          <input 
-                            type="date" 
-                            className="form-input" 
-                            value={formData.endDate || ''} 
-                            onChange={(e) => handleMacroDateRangeChange(formData.date, e.target.value)} 
+                          <input
+                            type="date"
+                            className="form-input"
+                            value={formData.endDate || ''}
+                            onChange={(e) => handleMacroDateRangeChange(formData.date, e.target.value)}
                           />
                         </div>
                       </div>
@@ -1903,9 +2929,9 @@ const AdminEventDetail = () => {
                           <label className="form-label">Event Session Window</label>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{ flex: 1 }}>
-                              <TimePicker 
+                              <TimePicker
                                 name="session-start"
-                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00'} 
+                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00'}
                                 onChange={(e) => {
                                   const end = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00';
                                   handleInputChange({ target: { name: 'session', value: `${e.target.value || '09:00'} - ${end}` } });
@@ -1914,9 +2940,9 @@ const AdminEventDetail = () => {
                             </div>
                             <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>TO</span>
                             <div style={{ flex: 1 }}>
-                              <TimePicker 
+                              <TimePicker
                                 name="session-end"
-                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00'} 
+                                value={(formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[1] : '13:00'}
                                 onChange={(e) => {
                                   const start = (formData.session && formData.session !== 'none' && formData.session.includes(' - ')) ? formData.session.split(' - ')[0] : '09:00';
                                   handleInputChange({ target: { name: 'session', value: `${start} - ${e.target.value || '13:00'}` } });
@@ -1929,10 +2955,10 @@ const AdminEventDetail = () => {
 
                       <div className="form-group">
                         <label className="form-label">Location / Hall Venue</label>
-                        <Select 
-                          name="location" 
-                          className="form-select" 
-                          value={formData.location} 
+                        <Select
+                          name="location"
+                          className="form-select"
+                          value={formData.location}
                           onChange={handleInputChange}
                         >
                           <option value="" disabled>Select a Venue...</option>
@@ -1941,7 +2967,7 @@ const AdminEventDetail = () => {
                           ))}
                         </Select>
                       </div>
-                      
+
                       <div className="ae-form-row">
                         <div className="form-group">
                           <label className="form-label">Resource Person / Speaker</label>
@@ -1952,7 +2978,7 @@ const AdminEventDetail = () => {
                           <input type="text" name="designation" className="form-input" placeholder="e.g., Professor, MIT" value={formData.designation} onChange={handleInputChange} />
                         </div>
                       </div>
-                      
+
                       <div className="form-group">
                         <label className="form-label">Resource Person Image</label>
                         <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', border: '1.5px dashed var(--clr-border)', background: 'var(--clr-surface)', height: '42px', display: 'flex', alignItems: 'center', padding: '0 14px' }}>
@@ -1966,8 +2992,8 @@ const AdminEventDetail = () => {
                             {formData.resourcePersonImage ? 'Image Uploaded ✓' : 'Click or Drag to Upload Image'}
                           </span>
                           {formData.resourcePersonImage && (
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--clr-danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                               onClick={(e) => { e.stopPropagation(); setFormData(prev => ({ ...prev, resourcePersonImage: '' })); }}
                             >
@@ -1975,7 +3001,7 @@ const AdminEventDetail = () => {
                             </button>
                           )}
                         </div>
-                        </div>
+                      </div>
                     </>
                   )}
                 </div>
@@ -1999,23 +3025,23 @@ const AdminEventDetail = () => {
                   <div className="ae-form-row">
                     <div className="form-group">
                       <label className="form-label">Max Members per Team</label>
-                      <StepperInput 
-                        name="teamSizeLimit" 
-                        min={1} 
-                        max={12} 
-                        value={formData.teamSizeLimit} 
-                        onChange={handleInputChange} 
+                      <StepperInput
+                        name="teamSizeLimit"
+                        min={1}
+                        max={12}
+                        value={formData.teamSizeLimit}
+                        onChange={handleInputChange}
                       />
                       <small className="text-muted">A team size of 1 denotes individual participation</small>
                     </div>
 
                     <div className="form-group">
                       <label className="form-label">Registrations Limit (Capacity)</label>
-                      <StepperInput 
-                        name="maxShortlisted" 
-                        min={0} 
-                        value={formData.maxShortlisted || 0} 
-                        onChange={handleInputChange} 
+                      <StepperInput
+                        name="maxShortlisted"
+                        min={0}
+                        value={formData.maxShortlisted || 0}
+                        onChange={handleInputChange}
                       />
                       <small className="text-muted">0 means no limit on registrations</small>
                     </div>
@@ -2133,6 +3159,80 @@ const AdminEventDetail = () => {
                     </label>
                   ))}
                 </div>
+
+                <div className="form-group" style={{ marginTop: '1.5rem', marginBottom: '0.85rem' }}>
+                  <label className="form-label" style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <MessageSquare size={15} color="var(--clr-accent)" /> Map Feedback Template (For Registered Participants)
+                  </label>
+                  <Select
+                    name="feedbackTemplate"
+                    className="form-select"
+                    value={formData.feedbackTemplate || ''}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Default General Feedback Form</option>
+                    {feedbackTemplates.map(tmpl => (
+                      <option key={tmpl._id} value={tmpl._id}>
+                        {tmpl.title} ({tmpl.fields?.length || 0} questions)
+                      </option>
+                    ))}
+                  </Select>
+                  <small style={{ color: 'var(--clr-text-muted)', fontSize: '0.72rem', marginTop: '6px', display: 'block', lineHeight: '1.4' }}>
+                    Registered participants will be prompted to fill this custom template upon event feedback submission.
+                  </small>
+                </div>
+              </>
+            )}
+
+            {/* Step 6: Overview & Status */}
+            {activeTab === 6 && (
+              <>
+                <div className="ae-wizard-banner">
+                  <div className="ae-wizard-banner-icon">
+                    <CheckCircle2 size={20} />
+                  </div>
+                  <div className="ae-wizard-banner-text">
+                    <span className="ae-wizard-banner-title">{WIZARD_STEPS[5].desc}</span>
+                    <span className="ae-wizard-banner-desc">{WIZARD_STEPS[5].sub}</span>
+                  </div>
+                </div>
+
+                <div className="ae-overview-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginTop: '1.25rem' }}>
+                  <div className="ae-overview-card" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--clr-border)' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--clr-accent)', fontWeight: '700' }}>General & Logistics</h4>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: 'var(--clr-text-muted)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <li><strong>Title:</strong> {formData.title || 'Untitled Event'}</li>
+                      <li><strong>Type:</strong> {formData.eventType?.toUpperCase() || 'NORMAL'}</li>
+                      <li><strong>Location:</strong> {formData.location || 'Not Configured'}</li>
+                      <li><strong>Resource Person:</strong> {formData.resourcePerson || 'None'}</li>
+                    </ul>
+                  </div>
+
+                  <div className="ae-overview-card" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--clr-border)' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--clr-accent)', fontWeight: '700' }}>Policies & Feedback</h4>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: 'var(--clr-text-muted)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <li><strong>Registrations:</strong> {formData.isRegistrationOpen !== false ? '✅ Open' : '❌ Closed'}</li>
+                      <li><strong>Feedback Form:</strong> {feedbackTemplates.find(t => t._id === formData.feedbackTemplate)?.title || 'Default General Feedback Form'}</li>
+                      <li><strong>Feedback Intake:</strong> {event?.isFeedbackOpen !== false ? '🟢 Accepting Responses' : '🔴 Suspended'}</li>
+                    </ul>
+                  </div>
+
+                  <div className="ae-overview-card" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--clr-border)', gridColumn: 'span 2' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--clr-accent)', fontWeight: '700' }}>Visibility Publish Status</h4>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.82rem', color: 'var(--clr-text-muted)' }}>
+                        {formData.isPublished ? '☀️ Event is currently published and visible to students.' : '🌙 Event is in draft mode (hidden from students).'}
+                      </span>
+                      <button
+                        type="button"
+                        className={`btn ${formData.isPublished ? 'btn-outline-danger' : 'btn-primary'} btn-sm`}
+                        onClick={() => handleInputChange({ target: { name: 'isPublished', type: 'checkbox', checked: !formData.isPublished } })}
+                      >
+                        {formData.isPublished ? 'Set to Draft' : 'Publish Event'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
 
@@ -2146,8 +3246,8 @@ const AdminEventDetail = () => {
                 const isActive = activeTab === stepNum;
                 const maxSteps = formData.eventType === 'macro' ? 4 : 6;
                 return (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className={`ae-stepper-item ${isActive ? 'active' : ''}`}
                     onClick={() => setActiveTab(stepNum)}
                     style={{ cursor: 'pointer' }}
@@ -2160,7 +3260,7 @@ const AdminEventDetail = () => {
             </div>
 
             <div className="ae-wizard-actions">
-              <button 
+              <button
                 className={`ae-wizard-btn primary ${submitting ? 'loading' : ''}`}
                 onClick={handleUpdateEvent}
                 disabled={submitting}
@@ -2172,10 +3272,10 @@ const AdminEventDetail = () => {
                 )}
                 {submitting ? 'Saving...' : 'Save Changes'}
               </button>
-              
-              <button 
+
+              <button
                 className="ae-wizard-btn secondary"
-                onClick={() => setActiveTab('dashboard')} 
+                onClick={() => setActiveTab('dashboard')}
               >
                 <Sliders size={15} /> Back to Dashboard
               </button>
@@ -2213,7 +3313,7 @@ const AdminEventDetail = () => {
             overflow: 'hidden',
             color: '#fff'
           }}>
-            
+
             {/* Modal Header */}
             <div style={{
               padding: '1.5rem 2rem',
@@ -2226,9 +3326,9 @@ const AdminEventDetail = () => {
                 <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#fff' }}>Create Sub-event</h3>
                 <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>Part of flagship: {formData.title}</p>
               </div>
-              <button 
-                type="button" 
-                className="btn btn-ghost btn-sm" 
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
                 style={{ minWidth: 'unset', width: '32px', height: '32px', padding: 0, borderRadius: '50%', color: '#94a3b8' }}
                 onClick={() => setShowSubEventWizard(false)}
               >
@@ -2284,29 +3384,29 @@ const AdminEventDetail = () => {
               flexDirection: 'column',
               gap: '1.5rem'
             }}>
-              
+
               {/* STEP 1: IDENTITY */}
               {subEventStep === 1 && (
                 <>
                   <div className="form-group">
                     <label className="form-label">Sub-event Title</label>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      name="title" 
+                    <input
+                      type="text"
+                      className="form-input"
+                      name="title"
                       placeholder="e.g. Speed Coding, UI/UX Design Challenge"
-                      value={subEventFormData.title || ''} 
-                      onChange={handleSubEventInputChange} 
-                      required 
+                      value={subEventFormData.title || ''}
+                      onChange={handleSubEventInputChange}
+                      required
                     />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Category</label>
-                    <Select 
-                      className="form-select" 
-                      name="category" 
-                      value={subEventFormData.category || 'None'} 
+                    <Select
+                      className="form-select"
+                      name="category"
+                      value={subEventFormData.category || 'None'}
                       onChange={handleSubEventInputChange}
                     >
                       <option value="None">None</option>
@@ -2322,12 +3422,12 @@ const AdminEventDetail = () => {
 
                   <div className="form-group">
                     <label className="form-label">Description</label>
-                    <textarea 
-                      className="form-input" 
-                      name="description" 
-                      rows="4" 
+                    <textarea
+                      className="form-input"
+                      name="description"
+                      rows="4"
                       placeholder="Detail the rules, formatting, and requirements..."
-                      value={subEventFormData.description || ''} 
+                      value={subEventFormData.description || ''}
                       onChange={handleSubEventInputChange}
                       required
                     />
@@ -2344,10 +3444,10 @@ const AdminEventDetail = () => {
                       position: 'relative',
                       cursor: 'pointer'
                     }}>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleSubEventImageUpload} 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleSubEventImageUpload}
                         style={{
                           position: 'absolute',
                           top: 0,
@@ -2360,13 +3460,13 @@ const AdminEventDetail = () => {
                       />
                       {subEventFormData.imageUrl ? (
                         <div style={{ position: 'relative' }}>
-                          <img 
-                            src={subEventFormData.imageUrl} 
-                            alt="Preview" 
-                            style={{ maxHeight: '140px', borderRadius: '8px', margin: '0 auto' }} 
+                          <img
+                            src={subEventFormData.imageUrl}
+                            alt="Preview"
+                            style={{ maxHeight: '140px', borderRadius: '8px', margin: '0 auto' }}
                           />
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="btn btn-xs btn-danger"
                             style={{ position: 'absolute', top: '5px', right: '5px', padding: '2px 6px', minHeight: 'unset' }}
                             onClick={(e) => {
@@ -2395,19 +3495,19 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Date</label>
-                      <DatePicker 
-                        value={subEventFormData.date ? getLocalDateString(subEventFormData.date) : ''} 
-                        onChange={handleSubEventInputChange} 
+                      <DatePicker
+                        value={subEventFormData.date ? getLocalDateString(subEventFormData.date) : ''}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Location / Venue</label>
-                      <Select 
-                        className="form-select" 
-                        name="location" 
-                        value={subEventFormData.location || ''} 
-                        onChange={handleSubEventInputChange} 
-                        required 
+                      <Select
+                        className="form-select"
+                        name="location"
+                        value={subEventFormData.location || ''}
+                        onChange={handleSubEventInputChange}
+                        required
                       >
                         <option value="" disabled>Select a Venue...</option>
                         {venues.map(v => (
@@ -2420,24 +3520,24 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Max Team Size</label>
-                      <StepperInput 
-                        name="teamSizeLimit" 
-                        min={1} 
-                        max={10} 
-                        value={subEventFormData.teamSizeLimit || 4} 
-                        onChange={handleSubEventInputChange} 
+                      <StepperInput
+                        name="teamSizeLimit"
+                        min={1}
+                        max={10}
+                        value={subEventFormData.teamSizeLimit || 4}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Number of Rounds</label>
-                      <input 
-                        type="number" 
-                        className="form-input" 
-                        name="rounds" 
-                        min="1" 
-                        max="5" 
-                        value={subEventFormData.rounds || 1} 
-                        onChange={handleSubEventInputChange} 
+                      <input
+                        type="number"
+                        className="form-input"
+                        name="rounds"
+                        min="1"
+                        max="5"
+                        value={subEventFormData.rounds || 1}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                   </div>
@@ -2445,19 +3545,19 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Max Shortlisted (0=∞)</label>
-                      <StepperInput 
-                        name="maxShortlisted" 
-                        min={0} 
-                        value={subEventFormData.maxShortlisted || 0} 
-                        onChange={handleSubEventInputChange} 
+                      <StepperInput
+                        name="maxShortlisted"
+                        min={0}
+                        value={subEventFormData.maxShortlisted || 0}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Session Slot</label>
-                      <Select 
-                        className="form-select" 
-                        name="session" 
-                        value={subEventFormData.session || 'none'} 
+                      <Select
+                        className="form-select"
+                        name="session"
+                        value={subEventFormData.session || 'none'}
                         onChange={handleSubEventInputChange}
                       >
                         <option value="none">No Session (Generic)</option>
@@ -2471,24 +3571,24 @@ const AdminEventDetail = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">
                       <label className="form-label">Resource Person / Contact</label>
-                      <input 
-                        type="text" 
-                        className="form-input" 
-                        name="resourcePerson" 
+                      <input
+                        type="text"
+                        className="form-input"
+                        name="resourcePerson"
                         placeholder="e.g. Prof. Alice (Resource)"
-                        value={subEventFormData.resourcePerson || ''} 
-                        onChange={handleSubEventInputChange} 
+                        value={subEventFormData.resourcePerson || ''}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Designation</label>
-                      <input 
-                        type="text" 
-                        className="form-input" 
-                        name="designation" 
+                      <input
+                        type="text"
+                        className="form-input"
+                        name="designation"
                         placeholder="e.g. Professor, MIT"
-                        value={subEventFormData.designation || ''} 
-                        onChange={handleSubEventInputChange} 
+                        value={subEventFormData.designation || ''}
+                        onChange={handleSubEventInputChange}
                       />
                     </div>
                   </div>
@@ -2526,8 +3626,8 @@ const AdminEventDetail = () => {
                         {subEventFormData.resourcePersonImage ? 'Image Uploaded ✓' : 'Click or Drag to Upload Image'}
                       </span>
                       {subEventFormData.resourcePersonImage && (
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           style={{ position: 'absolute', right: '10px', background: 'transparent', border: 'none', color: 'var(--clr-danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                           onClick={(e) => { e.stopPropagation(); setSubEventFormData(prev => ({ ...prev, resourcePersonImage: '' })); }}
                         >
@@ -2539,10 +3639,10 @@ const AdminEventDetail = () => {
 
                   <div className="form-group">
                     <label className="form-label">Attendance System Mode</label>
-                    <Select 
-                      className="form-select" 
-                      name="attendanceMode" 
-                      value={subEventFormData.attendanceMode || 'student_scan'} 
+                    <Select
+                      className="form-select"
+                      name="attendanceMode"
+                      value={subEventFormData.attendanceMode || 'student_scan'}
                       onChange={handleSubEventInputChange}
                     >
                       <option value="student_scan">Student Scans Admin (Traditional)</option>
@@ -2593,12 +3693,12 @@ const AdminEventDetail = () => {
                         <small style={{ fontSize: '0.75rem' }}>Make this sub-event visible to students immediately</small>
                       </div>
                       <div className="ae-toggle-switch">
-                        <input 
-                          type="checkbox" 
-                          name="isPublished" 
-                          checked={subEventFormData.isPublished || false} 
-                          onChange={handleSubEventInputChange} 
-                          style={{ display: 'none' }} 
+                        <input
+                          type="checkbox"
+                          name="isPublished"
+                          checked={subEventFormData.isPublished || false}
+                          onChange={handleSubEventInputChange}
+                          style={{ display: 'none' }}
                         />
                         <div className="ae-switch-track">
                           <div className="ae-switch-thumb" />
@@ -2620,8 +3720,8 @@ const AdminEventDetail = () => {
               alignItems: 'center',
               background: 'rgba(0, 0, 0, 0.1)'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={() => subEventStep > 1 && setSubEventStep(subEventStep - 1)}
                 disabled={subEventStep === 1}
@@ -2630,16 +3730,16 @@ const AdminEventDetail = () => {
               </button>
 
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-ghost btn-sm"
                   onClick={() => setShowSubEventWizard(false)}
                 >
                   Cancel
                 </button>
                 {subEventStep < 3 ? (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => {
                       if (subEventStep === 1 && (!subEventFormData.title || !subEventFormData.description)) {
@@ -2652,8 +3752,8 @@ const AdminEventDetail = () => {
                     Next &rarr;
                   </button>
                 ) : (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn btn-accent btn-sm"
                     onClick={submitSubEventWizard}
                     disabled={submitting}
@@ -2697,7 +3797,7 @@ const AdminEventDetail = () => {
                       style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
                       autoFocus
                     />
-                    <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
                   </div>
                 </div>
 
@@ -2706,9 +3806,9 @@ const AdminEventDetail = () => {
                   {coordLoading ? (
                     <div style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8', fontSize: '0.85rem' }}>Loading users…</div>
                   ) : coordUsers.filter(u => {
-                      const q = coordSearch.toLowerCase();
-                      return !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-                    }).length === 0 ? (
+                    const q = coordSearch.toLowerCase();
+                    return !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+                  }).length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8', fontSize: '0.85rem' }}>
                       No users found with admin roles.
                     </div>
@@ -2751,7 +3851,7 @@ const AdminEventDetail = () => {
                             </div>
                             {isAlreadyAdded && <span style={{ fontSize: '0.7rem', color: '#94a3b8', flexShrink: 0 }}>Added</span>}
                             {!isAlreadyAdded && (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
                             )}
                           </div>
                         );
@@ -2776,7 +3876,7 @@ const AdminEventDetail = () => {
                     <X size={18} />
                   </button>
                 </div>
-                
+
                 <div style={{ padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
                   <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.5rem', flexShrink: 0, marginBottom: '0.25rem' }}>
                     {selectedCoordUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
@@ -2785,7 +3885,7 @@ const AdminEventDetail = () => {
                     <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>{selectedCoordUser.name}</h4>
                     <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: '#64748b' }}>{selectedCoordUser.email}</p>
                   </div>
-                  
+
                   <div style={{ width: '100%', marginTop: '0.5rem' }}>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '0.75rem' }}>Select a role:</span>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>

@@ -30,7 +30,7 @@ export const getAdminAnalytics = async (req, res) => {
 // @desc    Create a new event
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, designation, resourcePersonImage, slug, noOfDays, dates, coordinators, approvalDetails } = req.body;
+    const { title, description, date, location, teamSizeLimit, rounds, roundConfig, imageUrl, isPublished, isRegistrationOpen, isTeamChangeAllowed, numberOfWinners, eventType, parentEvent, category, macroCountLimit, resourcePerson, designation, resourcePersonImage, slug, noOfDays, dates, coordinators, approvalDetails, feedbackTemplate } = req.body;
     
     const event = await Event.create({
       title,
@@ -57,6 +57,7 @@ export const createEvent = async (req, res) => {
       dates: eventType === 'macro' ? (dates || []) : [],
       coordinators: coordinators || [],
       approvalDetails: approvalDetails || null,
+      feedbackTemplate: feedbackTemplate || null,
       createdBy: req.user._id
     });
     
@@ -103,7 +104,10 @@ export const updateEvent = async (req, res) => {
 // @desc    Get all events (Admin view)
 export const getAdminEvents = async (req, res) => {
   try {
-    const events = await Event.find().sort('-createdAt').populate('createdBy', 'name');
+    const events = await Event.find()
+      .sort('-createdAt')
+      .populate('createdBy', 'name')
+      .populate('feedbackTemplate', 'title description fields');
     res.status(200).json({ success: true, events });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });

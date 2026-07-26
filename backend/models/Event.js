@@ -32,6 +32,7 @@ const eventSchema = new mongoose.Schema({
   isRegistrationOpen: { type: Boolean, default: true },
   isSubmissionOpen: { type: Boolean, default: false },
   isTeamChangeAllowed: { type: Boolean, default: true },
+  isFeedbackOpen: { type: Boolean, default: true },
   activeAttendance: {
     round: { type: Number, default: 0 },
     sessionToken: { type: String, default: '' },
@@ -72,6 +73,7 @@ const eventSchema = new mongoose.Schema({
       remarks: { type: String }
     }]
   },
+  feedbackTemplate: { type: mongoose.Schema.Types.ObjectId, ref: 'FeedbackTemplate', default: null },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 

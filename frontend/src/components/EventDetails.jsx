@@ -610,6 +610,19 @@ const EventDetails = () => {
                     </button>
                   </div>
                 )}
+                {registration && (
+                  <div className="feedback-prompt glass-strong" style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(16, 185, 129, 0.3)', marginBottom: '1.5rem', background: 'rgba(16, 185, 129, 0.05)' }}>
+                    <h4 style={{ color: '#fff', marginBottom: '0.5rem', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      💬 Event Feedback Form
+                    </h4>
+                    <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.7)', marginBottom: '1rem', lineHeight: '1.4' }}>
+                      {eventData?.feedbackTemplate ? 'A custom feedback template is active for this event.' : 'Share your feedback and rate your experience for this event.'}
+                    </p>
+                    <button type="button" className="btn btn-accent btn-block btn-sm" onClick={() => navigate(`/feedback?eventId=${eventData._id}`)} style={{ background: '#10b981', color: '#fff', border: 'none', fontWeight: '700' }}>
+                      ✍️ Fill Event Feedback
+                    </button>
+                  </div>
+                )}
                 <h2>Registration Form</h2>
 
                 {statusMessage.text && statusMessage.type && (

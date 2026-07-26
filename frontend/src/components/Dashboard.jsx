@@ -142,7 +142,10 @@ const Dashboard = () => {
                       <span>📍 {ev.location}</span>
                       <span>👥 {ev.teamSizeLimit} Members</span>
                     </div>
-                    <button className="btn btn-secondary btn-sm btn-block">View Details</button>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                      <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={(e) => { e.stopPropagation(); navigate(`/events/${ev.slug || ev._id}`); }}>View Details</button>
+                      <button className="btn btn-accent btn-sm" style={{ padding: '0.4rem 0.6rem', fontSize: '0.75rem', fontWeight: '700' }} onClick={(e) => { e.stopPropagation(); navigate(`/feedback?eventId=${ev._id}`); }}>💬 Feedback</button>
+                    </div>
                   </div>
                 </div>
               ))}

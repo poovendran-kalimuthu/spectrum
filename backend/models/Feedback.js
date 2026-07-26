@@ -11,7 +11,9 @@ const feedbackSchema = new mongoose.Schema({
   suggestions: { type: String, default: '' },
   overallSatisfaction: { type: Number, min: 1, max: 5 },
   recommendation: { type: Number, min: 1, max: 5 },
-  preferredNextEvent: { type: String, default: '' }
+  preferredNextEvent: { type: String, default: '' },
+  template: { type: mongoose.Schema.Types.ObjectId, ref: 'FeedbackTemplate', default: null },
+  templateAnswers: { type: mongoose.Schema.Types.Mixed, default: {} }
 }, { timestamps: true });
 
 const Feedback = mongoose.model('Feedback', feedbackSchema);

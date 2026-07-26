@@ -69,7 +69,8 @@ const EMPTY_FORM = {
   contactDetails: '',
   noOfDays: 1,
   dates: [],
-  coordinators: []
+  coordinators: [],
+  feedbackTemplate: ''
 };
 
 const WIZARD_STEPS = [
@@ -490,6 +491,7 @@ const PremiumToast = ({ toast, onClose }) => {
 const AdminEvents = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  const [feedbackTemplates, setFeedbackTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -531,7 +533,17 @@ const AdminEvents = () => {
   useEffect(() => {
     fetchUser();
     fetchEvents();
+    fetchFeedbackTemplates();
   }, []);
+
+  const fetchFeedbackTemplates = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/feedback/templates`, { withCredentials: true });
+      if (res.data.success) setFeedbackTemplates(res.data.data);
+    } catch (err) {
+      console.error('Error fetching feedback templates:', err);
+    }
+  };
 
   // Lock body scroll when modals are open
   useEffect(() => {
@@ -1149,6 +1161,23 @@ const AdminEvents = () => {
                       )}
                     </div>
                   )}
+
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MessageSquare size={15} color="var(--clr-accent)" /> Map Feedback Template (For Registered Participants)
+                    </label>
+                    <Select className="form-select" name="feedbackTemplate" value={formData.feedbackTemplate || ''} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
+                      <option value="">Default Feedback Form</option>
+                      {feedbackTemplates.map(tmpl => (
+                        <option key={tmpl._id} value={tmpl._id}>
+                          {tmpl.title} ({tmpl.fields?.length || 0} questions)
+                        </option>
+                      ))}
+                    </Select>
+                    <small style={{ color: '#64748b', fontSize: '0.72rem', marginTop: '4px', display: 'block' }}>
+                      Registered participants will fill this custom template when providing event feedback.
+                    </small>
+                  </div>
 
                   {formData.eventType === 'macro' && (
                     <>

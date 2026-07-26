@@ -86,6 +86,7 @@ const EMPTY_FORM = {
   noOfDays: 1,
   dates: [],
   coordinators: [],
+  feedbackTemplate: '',
   roundConfig: [{ roundNumber: 1, name: 'Round 1', maxAdvance: 0, evaluationType: 'admin', criteria: [{ name: 'Creativity & Innovation', maxScore: 20 }, { name: 'Technical Execution', maxScore: 20 }, { name: 'Presentation Skills', maxScore: 20 }, { name: 'Problem Solving', maxScore: 20 }, { name: 'Team Collaboration', maxScore: 20 }], assignedJudges: [] }],
   approvalDetails: {
     internalParticipants: '',
@@ -109,7 +110,7 @@ const WIZARD_STEPS = [
   { name: 'Team & Evaluation', desc: 'Configure team & evaluation limits', sub: 'Set team sizes, shortlisting limits, rounds, and winners.' },
   { name: 'Round Configurations', desc: 'Define round criteria', sub: 'Configure scoring criteria and advancement limits per round.' },
   { name: 'Event Coordinators', desc: 'Assign event coordinators', sub: 'Add the organizers and volunteers managing this event.' },
-  { name: 'Event Policies', desc: 'Establish event policies', sub: 'Specify attendance scanning modes and teammate edit rights.' },
+  { name: 'Policies & Feedback', desc: 'Establish event policies & feedback form', sub: 'Select feedback templates, set attendance modes, and control registration status.' },
   { name: 'Approval & Budget', desc: 'Configure approval document & budget', sub: 'Set participant counts and itemized budget details.' },
   { name: 'Overview & Launch', desc: 'Review & Launch', sub: 'Inspect all configurations before publishing the event.' }
 ];
@@ -821,12 +822,25 @@ const AdminEvents = () => {
   const [coordEmail, setCoordEmail] = useState('');
   const [coordRole, setCoordRole] = useState('Lead Coordinator');
 
+  const [feedbackTemplates, setFeedbackTemplates] = useState([]);
   const lastCheckedText = useRef('');
 
   useEffect(() => {
     fetchUser();
     fetchEvents();
+    fetchFeedbackTemplates();
   }, []);
+
+  const fetchFeedbackTemplates = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/feedback/templates`, { withCredentials: true });
+      if (res.data.success) {
+        setFeedbackTemplates(res.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching feedback templates:', err);
+    }
+  };
 
   // Route-based state sync
   useEffect(() => {
@@ -2140,6 +2154,7 @@ const AdminEvents = () => {
                     )}
                   </div>
 
+
                   {formData.eventType === 'macro' && (
                     <>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '0.85rem' }}>
@@ -2801,6 +2816,23 @@ const AdminEvents = () => {
                       </label>
                     ))}
                   </div>
+
+                  <div className="form-group" style={{ marginTop: '1.5rem', marginBottom: '0.85rem' }}>
+                    <label className="form-label" style={{ fontWeight: '600', color: '#334155', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
+                      <MessageSquare size={16} color="#6366f1" /> Map Feedback Template (For Participants)
+                    </label>
+                    <Select className="form-select" name="feedbackTemplate" value={formData.feedbackTemplate || ''} onChange={handleInputChange} style={{ width: '100%', borderRadius: '10px' }}>
+                      <option value="">Default General Feedback Form</option>
+                      {feedbackTemplates.map(tmpl => (
+                        <option key={tmpl._id} value={tmpl._id}>
+                          {tmpl.title} ({tmpl.fields?.length || 0} questions)
+                        </option>
+                      ))}
+                    </Select>
+                    <small style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '6px', display: 'block', lineHeight: '1.4' }}>
+                      Participants will be prompted to fill this custom template upon event feedback submission. Leave empty to use the default feedback form.
+                    </small>
+                  </div>
                 </>
               )}
 
@@ -3078,9 +3110,15 @@ const AdminEvents = () => {
                               : 'None (add later)'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' }}>
                           <span style={{ fontWeight: '600', color: '#475569', fontSize: '0.85rem' }}>Attendance Mode:</span>
                           <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.85rem' }}>{formData.attendanceMode || 'student_scan'}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem' }}>
+                          <span style={{ fontWeight: '600', color: '#475569', fontSize: '0.85rem' }}>Feedback Form:</span>
+                          <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.85rem' }}>
+                            {feedbackTemplates.find(t => t._id === formData.feedbackTemplate)?.title || 'Default General Feedback Form'}
+                          </span>
                         </div>
                       </>
                     )}
